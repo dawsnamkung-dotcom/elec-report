@@ -98,27 +98,21 @@
 <div class="form-container" id="pdf-area">
   <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표">
 
-  <!-- ================= 상단 정보 (숫자 키보드) ================= -->
   <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 16%; width: 4.5%; text-align:center;">
   <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%; text-align:center;">
   <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%; text-align:center;">
 
-  <!-- 수용가명 -->
   <input type="text" class="field" style="top: 15.1%; left: 12.5%; width: 34.5%;">
 
-  <!-- 수전전압/수전전력, 발전전압/발전전력 (숫자 키보드) -->
   <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 56.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 77.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 56.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 77.5%; width: 9%;">
 
-  <!-- ================= 점검 항목 구역 ================= -->
   <div id="check-items-container"></div>
   
-  <!-- 제2종 접지전류 mA (기본값 0 세팅) -->
   <input type="text" inputmode="numeric" class="field" style="top: 41.2%; left: 88.5%; width: 5%; text-align:center;" value="0">
 
-  <!-- ================= 전력량계 지침 (숫자 키보드) ================= -->
   <input type="text" inputmode="numeric" class="field" style="top: 43.6%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 45.9%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 48.2%; left: 46.5%; width: 25.5%;">
@@ -129,43 +123,42 @@
   <input type="text" inputmode="numeric" class="field" style="top: 55.1%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 57.4%; left: 46.5%; width: 25.5%;">
 
-  <!-- 전압, 전류, 역률 -->
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 12%; width: 10%; text-align:center;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%; text-align:center;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 60.5%; width: 10%; text-align:center;">
 
-  <!-- ================= 특이사항 및 종합의견 ================= -->
   <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5;"></textarea>
-  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5;"></textarea>
+  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.4; font-size:12px;"></textarea>
 
-  <!-- ================= 서명 캔버스 ================= -->
   <canvas id="sig1" class="sig-canvas" style="top: 91.5%; left: 17%; width: 19%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
   <canvas id="sig2" class="sig-canvas" style="top: 91.5%; left: 59%; width: 19%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
 
-<!-- 하단 조작 컨트롤바 -->
 <div class="controls-bar">
   <div class="controls-group">
-    <label for="opinionSelect">📝 종합의견 항목 다중 선택</label>
+    <label for="opinionSelect">📝 종합의견 항목 선택 (다중 선택 가능)</label>
     <select id="opinionSelect" onchange="handleOpinionSelect(this.value)">
       <option value="">-- 종합의견 선택하세요 --</option>
-      <option value="특고압 수전설비 외관점검 (AISS, MOF, TR, PF, LA 등) 이상소음, 이음누유, 변색, 냄새 등 - 양호">0. 특고압 수전설비 외관점검 - 양호</option>
-      <option value="각 분전함내 간선열화상태 및 차단기 단자 육안점검 - 양호">1. 각 분전함내 간선열화상태 및 차단기 단자 육안점검 - 양호</option>
-      <option value="ELD 누전경보기 점검 - 양호">2. ELD 누전경보기 점검 - 양호</option>
-      <option value="전력콘덴서 및 진상 지상 역률 점검 - 양호">3. 전력콘덴서 및 진상 지상 역률 점검 - 양호</option>
-      <option value="분전함 및 전기기계기구 접지선 탈락,단선 등 점검 - 양호">4. 분전함 및 전기기계기구 접지선 탈락,단선 등 점검 - 양호</option>
-      <option value="화재위험안전점검 (먼지, 분전함내 인화물질, 문어발식, 콘센트용량 과다여부, 콘센트접지) - 양호">5. 화재위험안전점검 - 양호</option>
-      <option value="분전함 내 차단기 나사조임 - 양호">6. 분전함 내 차단기 나사조임 - 양호</option>
-      <option value="차단기 월 1회 동작여부확인후 부동작시 교체요망 - 양호">7. 차단기 월 1회 동작여부확인후 부동작시 교체요망 - 양호</option>
-      <option value="전선 종류와 굵기 및 차단기용량 과다여부 - 양호">8. 전선 종류와 굵기 및 차단기용량 과다여부 - 양호</option>
-      <option value="CUSTOM">9. 기타 (직접 입력)</option>
+      <option value="AISS 조작반 전원 및 동작 상태 양호하며, PF 결상 및 퓨즈 용단 징후 없음. TR, MOF, AISS 등 코로나 방전(이음), 절연물 열화 냄새(이취), 단자부 변색 및 절연유 누유 등의 이상 징후 없이 정상 운전 중임">0. 특고압 수전설비 외관 및 작동 상태 점검</option>
+      <option value="메인 차단기(ACB 등)에서 각 분전함으로 연결되는 주요 간선의 피복 열화 상태 및 단자 접속부 육안 및  열화상 점검 결과 발열 및 특이사항 없음">1. 메인 차단기 및 주요 간선 열화상 점검</option>
+      <option value="메인반 내 ELD 누전경보기 수신반 정상 작동 중이며, 각 회로별 설정된 누설전류 경보 알람 발생 이력 없음">2. ELD 누전경보기 수신반 점검</option>
+      <option value="전력용 콘덴서 상태 정상(배부름, 누유 없음)이며, 현재 진상 및 지상 역률이 적정하게 유지되어 전력 손실 및 요금 할증 우려 없음">3. 전력용 콘덴서 및 역률 상태 점검</option>
+      <option value="주요 분기 회로 점검 결과, 부하 특성에 따른 전선의 종류 및 굵기가 차단기 정격 용량을 초과하지 않는지 점검">4. 주요 분기 회로 전선 굵기 및 용량 점검</option>
+      <option value="화재 위험 안전 점검 결과, 일부 현장에서 문어발식 콘센트 사용 및 허용 용량 초과 기기 사용 점검">5. 화재 위험 안전 점검 (문어발/허용용량)</option>
+      <option value="진동 및 온도 변화에 의한 아크 발생, 접촉 불량을 방지하기 위해 분전함 내 차단기 1, 2차측 단자 나사 조임 상태를 확인">6. 분전함 내 차단기 단자 나사 조임 상태 점검</option>
+      <option value="주요 전기기계기구 외함 접지선의 단선 및 단자대 탈락 여부를 점검 이상 없음">7. 전기기계기구 외함 접지선 단선/탈락 점검</option>
+      <option value="현장 관리자에게 매월 1회 정기적으로 누전차단기 테스트 버튼을 눌러 동작 여부를 확인할 것을 교육함. 부동작 차단기 발견 시 대형 감전 사고로 이어질 수 있으므로 즉시 당사로 통보하여 교체할 것을 고지함">8. 현장 관리자 누전차단기 테스트 교육 및 고지</option>
+      <option value="비선형 부하(인버터, 전산장비 등) 집중 사용 회로의 N상 고조파 전류 유입 및 발열 상태 점검 결과 특이사항 없음.">9. 비선형 부하 N상 고조파 및 발열 점검</option>
+      <option value="낙뢰 및 이상 전압 방어용 서지보호기(SPD) 상태 표시창(녹색 정상) 육안 점검 결과 양호함.">10. 서지보호기(SPD) 상태 육안 점검</option>
+      <option value="각 층 EPS실 내 청소도구 등 가연성 물품 무단 보관 적발. 전기 화재 시 수직 굴뚝 역할을 하므로 즉시 반출 및 시건 유지 지시함">11. EPS실 내 가연물 무단 보관 적발 및 반출 지시</option>
+      <option value="수전실 출입문 및 주요 특고압 반 '특고압 접근금지' 경고 표지판 부착 상태 양호함">12. 수전실 및 특고압 반 경고 표지판 부착 점검</option>
+      <option value="CUSTOM">13. 기타 (직접 입력)</option>
     </select>
   </div>
   
   <button class="btn-save" onclick="savePDF()">점검표 저장 및 PDF 다운로드</button>
 </div>
 
-<!-- ================= 대형 서명 팝업 모달 ================= -->
 <div id="sigModal" class="modal-overlay">
   <div class="modal-content">
     <h3 id="modalTitle" class="modal-title">성명 및 서명</h3>
@@ -208,7 +201,7 @@
     }
   }
 
-  // 2. 종합의견 다중 선택 처리 함수 (수정된 부분)
+  // 2. 종합의견 다중 선택 처리 함수
   function handleOpinionSelect(selectedValue) {
     const opinionTextarea = document.getElementById('opinionText');
     const selectElement = document.getElementById('opinionSelect');
@@ -216,18 +209,14 @@
     if (selectedValue === 'CUSTOM') {
       opinionTextarea.focus();
     } else if (selectedValue !== '') {
-      // 텍스트 상자가 비어있으면 바로 넣고, 내용이 있으면 줄바꿈 후 추가
       if (opinionTextarea.value.trim() === '') {
         opinionTextarea.value = selectedValue;
       } else {
-        // 똑같은 내용이 이미 들어있지 않은 경우에만 추가 (중복 방지)
         if (!opinionTextarea.value.includes(selectedValue)) {
           opinionTextarea.value += '\n' + selectedValue;
         }
       }
     }
-    
-    // 선택한 뒤 드롭다운을 다시 초기 상태로 되돌림 (연속 선택을 위해)
     selectElement.value = '';
   }
 
