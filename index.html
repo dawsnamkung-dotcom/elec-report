@@ -3,269 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>전기설비 점검 기록표</title>
+  <title>전기설비 점검기록표</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    * { box-sizing: border-box; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
-    body { background-color: #f4f6f8; margin: 0; padding: 15px; font-size: 13px; }
-    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #000; }
+    body { background: #f0f0f0; margin: 0; padding: 20px; font-family: sans-serif; }
     
-    h1 { text-align: center; text-decoration: underline; text-underline-offset: 8px; letter-spacing: 5px; margin-bottom: 30px; font-size: 26px; }
-    
-    .header-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .header-info input { border: none; border-bottom: 1px solid #000; outline: none; font-size: 14px; text-align: center; }
-    
-    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
-    th, td { border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle; }
-    th { font-weight: bold; background-color: #fcfcfc; }
-    
-    input[type="text"], input[type="number"] { width: 100%; border: none; outline: none; background: transparent; text-align: center; font-size: 13px; }
-    textarea { width: 100%; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit; line-height: 1.6; }
-    
-    /* 터치 토글 셀 (O, X, /) */
-    .toggle-cell { cursor: pointer; font-weight: bold; font-size: 16px; color: #0056b3; background-color: #f0f8ff; transition: background 0.2s; user-select: none; }
-    .toggle-cell:active { background-color: #d0e8ff; }
-    
-    .notice-box { text-align: left; padding: 10px; font-size: 12px; line-height: 1.5; }
-    
-    .signature-area { display: flex; justify-content: space-between; align-items: center; height: 80px; }
-    .sig-box { width: 48%; position: relative; border: 1px dashed #ccc; height: 100%; display: flex; align-items: center; justify-content: center; }
-    .sig-box span { position: absolute; left: 10px; top: 10px; font-weight: bold; color: #555; }
-    canvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; position: absolute; top: 0; left: 0; }
-    .clear-btn { position: absolute; right: 5px; bottom: 5px; font-size: 10px; padding: 2px 5px; z-index: 10; }
-
-    .footer-slogan { text-align: center; font-size: 18px; font-weight: bold; margin-top: 15px; }
-    .footer-company { text-align: center; font-size: 22px; font-weight: bold; letter-spacing: 3px; margin-top: 5px; }
-    
-    .action-btns { margin-top: 30px; text-align: center; }
-    .btn-submit { padding: 15px 30px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    
-    /* 프린트/PDF 생성 시 UI 요소 숨기기 */
-    @media print {
-      body { background: #fff; padding: 0; }
-      .container { box-shadow: none; max-width: 100%; padding: 0; }
-      .action-btns, .clear-btn { display: none !important; }
-      .toggle-cell { color: #000; background-color: transparent; }
-      .sig-box { border: none; }
+    /* 양식 이미지를 감싸는 컨테이너 */
+    .form-container {
+      position: relative;
+      width: 800px; /* 양식 고정 너비 (A4 비율) */
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
+
+    /* 원본 양식 이미지 */
+    .bg-image {
+      width: 100%;
+      display: block;
+    }
+
+    /* 이미지 위에 얹어질 입력창 공통 스타일 */
+    .field {
+      position: absolute;
+      background: rgba(230, 240, 255, 0.5); /* 위치 잡기용 연한 푸른색 (완성 후 transparent 변경 가능) */
+      border: 1px solid #70a1ff;
+      border-radius: 3px;
+      font-size: 13px;
+      padding: 2px 5px;
+      box-sizing: border-box;
+    }
+    .field:focus {
+      background: #ffffff;
+      border: 2px solid #1e90ff;
+      outline: none;
+    }
+
+    /* 체크 박스 / 토글 버튼 (O, X, /) */
+    .check-field {
+      position: absolute;
+      cursor: pointer;
+      font-weight: bold;
+      text-align: center;
+      color: #0000ed;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 서명 캔버스 */
+    .sig-canvas {
+      position: absolute;
+      touch-action: none;
+      border: 1px dashed #ffa500;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-bar { text-align: center; margin-top: 20px; }
+    .btn-save { padding: 12px 25px; background: #2ed573; color: white; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
   </style>
 </head>
 <body>
 
-<div class="container" id="report-area">
-  <h1>전기 설비 점검 기록표</h1>
+<div class="form-container" id="pdf-area">
+  <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표 양식">
+
+  <input type="text" class="field" style="top: 4.2%; left: 16%; width: 5%; text-align:center;" placeholder="26">
+  <input type="text" class="field" style="top: 4.2%; left: 24%; width: 4%; text-align:center;" placeholder="09">
+
+  <input type="text" class="field" style="top: 7.2%; left: 13%; width: 34%;" placeholder="수용가명 입력">
+
+  <input type="text" class="field" style="top: 6.8%; left: 56%; width: 10%;">
+  <input type="text" class="field" style="top: 6.8%; left: 77%; width: 10%;">
+
+  <div class="check-field" style="top: 15.2%; left: 21.5%; width: 3.5%; height: 2.2%;" onclick="toggleMark(this)">O</div>
+  <div class="check-field" style="top: 17.5%; left: 21.5%; width: 3.5%; height: 2.2%;" onclick="toggleMark(this)">O</div>
+
+  <textarea class="field" style="top: 77%; left: 7%; width: 86%; height: 11%; background: transparent; border: none; font-size: 14px; line-height: 1.8;"></textarea>
+
+  <canvas id="sig1" class="sig-canvas" style="top: 90.5%; left: 16%; width: 28%; height: 4%;"></canvas>
   
-  <div class="header-info">
-    <div>* 점검일 : <input type="date" id="checkDate" style="width: 130px;"></div>
-  </div>
+  <canvas id="sig2" class="sig-canvas" style="top: 90.5%; left: 60%; width: 28%; height: 4%;"></canvas>
+</div>
 
-  <table>
-    <colgroup>
-      <col width="15%"><col width="35%"><col width="15%"><col width="15%"><col width="10%"><col width="10%">
-    </colgroup>
-    <tr>
-      <th>수용가명</th>
-      <td><input type="text" id="custName" placeholder="수용가 입력"></td>
-      <th>수전전압</th>
-      <td><input type="text" id="recvVolt"></td>
-      <th style="border-right: none;">V 수전전력</th>
-      <td style="border-left: none;"><input type="text" id="recvPower"> KW</td>
-    </tr>
-    <tr>
-      <th colspan="2"></th>
-      <th>발전전압</th>
-      <td><input type="text" id="genVolt"></td>
-      <th style="border-right: none;">V 발전전력</th>
-      <td style="border-left: none;"><input type="text" id="genPower"> KW</td>
-    </tr>
-  </table>
-
-  <table>
-    <tr>
-      <th colspan="8">전 기 설 비 점 검 사 항 <span style="font-size: 11px; font-weight: normal;">(표시방법 : 양호 O 표, 불량 X 표, 해당없음 / 표)</span></th>
-    </tr>
-    <tr>
-      <th colspan="4">저 압 설 비</th>
-      <th colspan="4">고 압 설 비</th>
-    </tr>
-    <script>
-      const low1 = ["인입구 배선", "배 전 반", "배선용차단기", "누전차단기", "분 전 반", "M C C 반", "누전경보기", "구내배선"];
-      const low2 = ["전 동 기", "콘 센 트", "전기용접기", "접지관계", "콘 덴 서", "조명설비", "발전설비", "ATS 설비"];
-      const high1 = ["재산 분계점", "인입선로", "수전용개폐기", "파 워 휴 즈", "피 뢰 기", "변 성 기", "P T", "C T"];
-      const high2 = ["수전용차단기", "변 압 기", "수 전 반", "계 전 기", "보호시설", "조작용구", "주위정리", "제2종접지전류"];
-
-      for(let i=0; i<8; i++) {
-        document.write(`
-          <tr>
-            <td>${low1[i]}</td><td class="toggle-cell" onclick="toggleStatus(this)">O</td>
-            <td>${low2[i]}</td><td class="toggle-cell" onclick="toggleStatus(this)">O</td>
-            <td>${high1[i]}</td><td class="toggle-cell" onclick="toggleStatus(this)">O</td>
-            <td>${high2[i]}</td>
-            ${i === 7 ? '<td><input type="text" style="width:50px;"> mA</td>' : '<td class="toggle-cell" onclick="toggleStatus(this)">O</td>'}
-          </tr>
-        `);
-      }
-    </script>
-  </table>
-
-  <table>
-    <colgroup>
-      <col width="15%"><col width="15%"><col width="35%"><col width="35%">
-    </colgroup>
-    <tr>
-      <th colspan="2">구 분</th>
-      <th>전 력 량 계 지 침</th>
-      <th>특 이 사 항</th>
-    </tr>
-    <tr>
-      <th rowspan="3">유효전력</th>
-      <th>주 간</th>
-      <td><input type="text"></td>
-      <td rowspan="8" style="vertical-align: top;"><textarea rows="10"></textarea></td>
-    </tr>
-    <tr><th>저 녁</th><td><input type="text"></td></tr>
-    <tr><th>심 야</th><td><input type="text"></td></tr>
-    <tr>
-      <th rowspan="2">최대전력</th>
-      <th>주 간</th>
-      <td><input type="text"></td>
-    </tr>
-    <tr><th>저 녁</th><td><input type="text"></td></tr>
-    <tr>
-      <th rowspan="2">무효전력</th>
-      <th>주 간</th>
-      <td><input type="text"></td>
-    </tr>
-    <tr><th>저 녁</th><td><input type="text"></td></tr>
-    <tr>
-      <th>전압</th>
-      <th style="text-align: right;">V</th>
-      <td>전류 <input type="text" style="width:40px;"> A &nbsp;|&nbsp; 역률 <input type="text" style="width:40px;"> %</td>
-    </tr>
-  </table>
-
-  <table style="margin-bottom: 0; border-bottom: none;">
-    <tr>
-      <td class="notice-box">
-        <b>★ 전기 안전교육 및 숙지사항</b> (다음 내용을 숙지하여 전기재해를 예방 합시다.)<br>
-        1. 모든전기기계기구 사용시 부적합한 전기설비는 누전이나 감전, 전기화재, 전력손실, 정전사고등<br>
-        &nbsp;&nbsp;&nbsp;전기재해의 원인이 될 수 있으니 전기기술에 적합하게 改修하여 사용하시기 바랍니다.<br>
-        2. 일과후 또는 작업종료후 사용하지 않는 전기기기의 차단기는 모두 개방(OFF)하시기 바랍니다.<br>
-        3. 모든 전기기계기구의 외함은 접지를 시공하고 규정에 맞는 접지저항값을 유지하시기 바랍니다.<br>
-        4. 문어발식 전기기기의 사용을 절대 금지하고, 전원선으로 비닐코드 배선사용을 금지 하십시오.<br>
-        5. 전기설비 이상 및 변경시 당사의 전기안전관리자와 협의 후 조치바랍니다.(임의조치 절대금지)
-      </td>
-    </tr>
-  </table>
-
-  <table style="border-top: none;">
-    <tr>
-      <td style="text-align: left; padding: 15px; height: 100px; vertical-align: top;">
-        <b>※ 종 합 의 견</b><br>
-        <textarea rows="4" style="width:100%; border-bottom: 1px dotted #ccc; margin-top: 5px;"></textarea>
-      </td>
-    </tr>
-  </table>
-
-  <table>
-    <colgroup><col width="15%"><col width="35%"><col width="15%"><col width="35%"></colgroup>
-    <tr>
-      <th>점 검 자</th>
-      <td style="padding:0;">
-        <div class="sig-box">
-          <canvas id="sigInspector"></canvas>
-          <button type="button" class="clear-btn" onclick="clearCanvas(ctxInspector, canvasInspector)">지우기</button>
-        </div>
-      </td>
-      <th>확 인 자</th>
-      <td style="padding:0;">
-        <div class="sig-box">
-          <canvas id="sigCustomer"></canvas>
-          <button type="button" class="clear-btn" onclick="clearCanvas(ctxCustomer, canvasCustomer)">지우기</button>
-        </div>
-      </td>
-    </tr>
-  </table>
-
-  <div class="footer-slogan">"전기사고 예방으로 인명과 재산을 보호합시다."</div>
-  <div class="footer-company">(주)한국전기보안관리</div>
-
-  <div class="action-btns">
-    <button type="button" class="btn-submit" onclick="generatePDF()">점검표 저장 및 PDF 생성</button>
-  </div>
+<div class="btn-bar">
+  <button class="btn-save" onclick="savePDF()">PDF 다운로드</button>
 </div>
 
 <script>
-  // 날짜 기본 세팅
-  document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
-
-  // O, X, / 터치 토글 기능
-  function toggleStatus(element) {
-    const current = element.innerText;
-    if (current === 'O') element.innerText = 'X';
-    else if (current === 'X') element.innerText = '/';
-    else element.innerText = 'O';
+  function toggleMark(el) {
+    if (el.innerText === 'O') el.innerText = 'X';
+    else if (el.innerText === 'X') el.innerText = '/';
+    else el.innerText = 'O';
   }
 
-  // 서명 캔버스 공통 설정 함수
-  function setupCanvas(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
-
-    function resize() {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = '#000';
-    }
-    window.addEventListener('resize', resize);
-    setTimeout(resize, 100);
-
-    function getPos(e) {
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-
-    canvas.addEventListener('mousedown', (e) => { isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
-    canvas.addEventListener('mousemove', (e) => { if (isDrawing) { const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }});
-    window.addEventListener('mouseup', () => isDrawing = false);
-    
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, {passive: false});
-    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if (isDrawing) { const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }}, {passive: false});
-    canvas.addEventListener('touchend', () => isDrawing = false);
-
-    return { canvas, ctx };
-  }
-
-  const { canvas: canvasInspector, ctx: ctxInspector } = setupCanvas('sigInspector');
-  const { canvas: canvasCustomer, ctx: ctxCustomer } = setupCanvas('sigCustomer');
-
-  function clearCanvas(ctx, canvas) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  // PDF 생성 로직
-  function generatePDF() {
-    const element = document.getElementById('report-area');
-    const custName = document.getElementById('custName').value || '수용가';
-    const date = document.getElementById('checkDate').value;
-    
-    // UI 요소 숨기기 위한 클래스 임시 적용은 @media print가 html2pdf에서도 적용되도록 세팅
+  // PDF 저장 시 오버레이 스타일 다듬기
+  function savePDF() {
+    const element = document.getElementById('pdf-area');
     const opt = {
-      margin: 5,
-      filename: `전기설비점검기록표_${custName}_${date}.pdf`,
+      margin: 0,
+      filename: '전기설비점검기록표.pdf',
       image: { type: 'jpeg', quality: 1 },
-      html2canvas: { scale: 2, useCORS: true },
+      html2canvas: { scale: 2 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-
     html2pdf().set(opt).from(element).save();
   }
 </script>
+
 </body>
 </html>
