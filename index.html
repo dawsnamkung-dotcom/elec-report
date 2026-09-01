@@ -103,21 +103,27 @@
 <div class="form-container" id="pdf-area">
   <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표">
 
+  <!-- ================= 상단 정보 (가운데 정렬) ================= -->
   <input type="text" inputmode="numeric" class="field" style="top: 16%; left: 19%; width: 4.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%;">
 
+  <!-- 수용가명 (가운데 정렬) -->
   <input type="text" class="field" style="top: 15.1%; left: 12.5%; width: 34.5%;">
 
+  <!-- 수전전압/수전전력, 발전전압/발전전력 (가운데 정렬) -->
   <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 56.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 77.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 56.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 77.5%; width: 9%;">
 
+  <!-- ================= 점검 항목 구역 ================= -->
   <div id="check-items-container"></div>
   
+  <!-- 제2종 접지전류 mA (기본값 0, 가운데 정렬) -->
   <input type="text" inputmode="numeric" class="field" style="top: 41.2%; left: 88.5%; width: 5%;" value="0">
 
+  <!-- ================= 전력량계 지침 (가운데 정렬) ================= -->
   <input type="text" inputmode="numeric" class="field" style="top: 43.6%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 45.9%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 48.2%; left: 46.5%; width: 25.5%;">
@@ -128,18 +134,24 @@
   <input type="text" inputmode="numeric" class="field" style="top: 55.1%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 57.4%; left: 46.5%; width: 25.5%;">
 
+  <!-- 전압, 전류, 역률 (가운데 정렬) -->
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 12%; width: 10%;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 60.5%; width: 10%;">
 
+  <!-- ================= 특이사항 및 종합의견 (좌측 정렬 유지) ================= -->
+  <!-- 특이사항 (좌측 정렬) -->
   <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
   
+  <!-- 종합의견 (좌측 정렬) -->
   <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5; font-size:14px; text-align: left;"></textarea>
 
+  <!-- ================= 서명 캔버스 ================= -->
   <canvas id="sig1" class="sig-canvas" style="top: 91.5%; left: 17%; width: 19%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
   <canvas id="sig2" class="sig-canvas" style="top: 91.5%; left: 59%; width: 19%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
 
+<!-- 하단 조작 컨트롤바 -->
 <div class="controls-bar">
   <div class="controls-group">
     <label for="opinionSelect">📝 종합의견 항목 선택 (다중 선택 가능)</label>
@@ -165,6 +177,7 @@
   <button class="btn-save" onclick="savePDF()">점검표 저장 및 PDF 다운로드</button>
 </div>
 
+<!-- ================= 대형 서명 팝업 모달 ================= -->
 <div id="sigModal" class="modal-overlay">
   <div class="modal-content">
     <h3 id="modalTitle" class="modal-title">성명 및 서명</h3>
@@ -207,7 +220,7 @@
     }
   }
 
-  // 2. 종합의견 다중 선택 처리 함수
+  // 2. 종합의견 다중 선택 처리 함수 (자동 번호 추가 반영)
   function handleOpinionSelect(selectedValue) {
     const opinionTextarea = document.getElementById('opinionText');
     const selectElement = document.getElementById('opinionSelect');
@@ -215,15 +228,23 @@
     if (selectedValue === 'CUSTOM') {
       opinionTextarea.focus();
     } else if (selectedValue !== '') {
-      if (opinionTextarea.value.trim() === '') {
-        opinionTextarea.value = selectedValue;
-      } else {
-        if (!opinionTextarea.value.includes(selectedValue)) {
-          opinionTextarea.value += '\n' + selectedValue;
+      // 이미 같은 내용이 들어있는지 확인 (중복 방지용, 앞의 숫자 제외하고 내용만 비교)
+      if (!opinionTextarea.value.includes(selectedValue)) {
+        
+        // 현재 텍스트상자에 있는 줄 수를 계산 (빈 줄은 무시)
+        const currentLines = opinionTextarea.value.split('\n').filter(line => line.trim() !== '');
+        const nextNumber = currentLines.length + 1; // 다음 번호 계산
+        const newText = nextNumber + ". " + selectedValue; // 번호와 내용 합치기
+
+        // 텍스트상자가 비어있으면 바로 넣고, 아니면 줄바꿈 후 추가
+        if (opinionTextarea.value.trim() === '') {
+          opinionTextarea.value = newText;
+        } else {
+          opinionTextarea.value = opinionTextarea.value.trimEnd() + '\n' + newText;
         }
       }
     }
-    selectElement.value = '';
+    selectElement.value = ''; // 드롭다운 초기화
   }
 
   // ================= 3. 서명 모달 및 스크롤 방지 로직 =================
