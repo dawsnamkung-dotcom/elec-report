@@ -96,7 +96,6 @@
 <body>
 
 <div class="form-container" id="pdf-area">
-  <!-- 파일명 수정됨: form_bg.jpg -->
   <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표">
 
   <!-- ================= 상단 정보 (숫자 키보드) ================= -->
@@ -139,7 +138,7 @@
   <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5;"></textarea>
   <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5;"></textarea>
 
-  <!-- ================= 서명 캔버스 (클릭 시 확대 모달 실행) ================= -->
+  <!-- ================= 서명 캔버스 ================= -->
   <canvas id="sig1" class="sig-canvas" style="top: 91.5%; left: 17%; width: 19%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
   <canvas id="sig2" class="sig-canvas" style="top: 91.5%; left: 59%; width: 19%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
@@ -147,7 +146,7 @@
 <!-- 하단 조작 컨트롤바 -->
 <div class="controls-bar">
   <div class="controls-group">
-    <label for="opinionSelect">📝 종합의견 항목 선택</label>
+    <label for="opinionSelect">📝 종합의견 항목 다중 선택</label>
     <select id="opinionSelect" onchange="handleOpinionSelect(this.value)">
       <option value="">-- 종합의견 선택하세요 --</option>
       <option value="특고압 수전설비 외관점검 (AISS, MOF, TR, PF, LA 등) 이상소음, 이음누유, 변색, 냄새 등 - 양호">0. 특고압 수전설비 외관점검 - 양호</option>
@@ -209,15 +208,27 @@
     }
   }
 
-  // 2. 종합의견 선택 처리 함수
+  // 2. 종합의견 다중 선택 처리 함수 (수정된 부분)
   function handleOpinionSelect(selectedValue) {
     const opinionTextarea = document.getElementById('opinionText');
+    const selectElement = document.getElementById('opinionSelect');
+
     if (selectedValue === 'CUSTOM') {
-      opinionTextarea.value = '';
       opinionTextarea.focus();
     } else if (selectedValue !== '') {
-      opinionTextarea.value = selectedValue;
+      // 텍스트 상자가 비어있으면 바로 넣고, 내용이 있으면 줄바꿈 후 추가
+      if (opinionTextarea.value.trim() === '') {
+        opinionTextarea.value = selectedValue;
+      } else {
+        // 똑같은 내용이 이미 들어있지 않은 경우에만 추가 (중복 방지)
+        if (!opinionTextarea.value.includes(selectedValue)) {
+          opinionTextarea.value += '\n' + selectedValue;
+        }
+      }
     }
+    
+    // 선택한 뒤 드롭다운을 다시 초기 상태로 되돌림 (연속 선택을 위해)
+    selectElement.value = '';
   }
 
   // ================= 3. 서명 모달 및 저장 로직 =================
@@ -227,7 +238,6 @@
   const modalCtx = modalCanvas.getContext('2d');
   let isModalDrawing = false;
 
-  // 모달 캔버스 그리기 이벤트 등록
   function getModalPos(e) {
     const rect = modalCanvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -242,7 +252,6 @@
   modalCanvas.addEventListener('mousedown', startModalDraw);
   modalCanvas.addEventListener('mousemove', drawModal);
   window.addEventListener('mouseup', endModalDraw);
-
   modalCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startModalDraw(e); }, { passive: false });
   modalCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); drawModal(e); }, { passive: false });
   modalCanvas.addEventListener('touchend', endModalDraw);
@@ -261,7 +270,6 @@
       modalCtx.strokeStyle = '#000';
       clearModalCanvas();
 
-      // 기존 저장된 서명이 있으면 불러와서 표시
       if (savedSignatures[currentTargetCanvasId]) {
         const img = new Image();
         img.onload = () => modalCtx.drawImage(img, 0, 0, modalCanvas.width, modalCanvas.height);
@@ -270,22 +278,13 @@
     }, 100);
   }
 
-  function closeModal() {
-    document.getElementById('sigModal').style.display = 'none';
-  }
-
-  function clearModalCanvas() {
-    modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height);
-  }
+  function closeModal() { document.getElementById('sigModal').style.display = 'none'; }
+  function clearModalCanvas() { modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height); }
 
   function applySignature() {
     if (!currentTargetCanvasId) return;
-    
-    // 모달 캔버스의 서명을 이미지 URL로 저장
     const dataUrl = modalCanvas.toDataURL();
     savedSignatures[currentTargetCanvasId] = dataUrl;
-    
-    // 양식 상의 소형 캔버스에 그리기
     renderTargetCanvas(currentTargetCanvasId);
     closeModal();
   }
@@ -306,17 +305,8 @@
     }
   }
 
-  // 화면 크기 조정 시 서명 재렌더링
-  window.addEventListener('resize', () => {
-    renderTargetCanvas('sig1');
-    renderTargetCanvas('sig2');
-  });
-
-  // 초기 캔버스 사이즈 세팅
-  setTimeout(() => {
-    renderTargetCanvas('sig1');
-    renderTargetCanvas('sig2');
-  }, 300);
+  window.addEventListener('resize', () => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); });
+  setTimeout(() => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); }, 300);
 
   // 4. PDF 저장 로직
   function savePDF() {
