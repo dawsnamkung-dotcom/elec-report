@@ -4,18 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>전기설비 점검기록표</title>
+  
+  <!-- ★ 앱 설치(PWA)를 위한 메타 태그 및 아이콘 설정 ★ -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="전기점검표">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2991/2991112.png">
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%EC%A0%84%EA%B8%B0%EC%84%A4%EB%B9%84%20%EC%A0%90%EA%B2%80%EA%B8%B0%EB%A1%9D%ED%91%9C%22%2C%22short_name%22%3A%22%EC%A0%90%EA%B2%80%ED%91%9C%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%23007bff%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2991%2F2991112.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { background: #e9ecef; margin: 0; padding: 10px; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
     
-    /* ★ 흔들림 원천 차단: 제일 처음 성공했던 터치 잠금 코드 원복 ★ */
     body.modal-open { overflow: hidden !important; touch-action: none !important; }
 
     .form-container { position: relative; max-width: 800px; margin: 0 auto; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     .bg-image { width: 100%; display: block; pointer-events: none; }
     
-    /* 입력 필드 (위아래 여백을 없애서 잘림 원천 방지) */
     .field { 
         position: absolute; 
         background: rgba(230, 240, 255, 0.6); 
@@ -29,7 +36,6 @@
     }
     .field:focus { background: rgba(255, 255, 255, 0.95); border: 2px solid #1e90ff; outline: none; z-index: 10;}
     
-    /* O, /, X 토글 버튼 (굵기 일반으로 변경) */
     .check-field { 
         position: absolute; 
         cursor: pointer; 
@@ -65,6 +71,10 @@
     
     .btn-save { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .btn-save:active { background: #0056b3; }
+
+    /* ★ 홈 화면 앱 설치 버튼 스타일 ★ */
+    .btn-install { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-top: 10px; }
+    .btn-install:active { background: #218838; }
 
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -168,10 +178,10 @@
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 59%; width: 10%;">
 
-  <!-- 특이사항 (14px) -->
-  <textarea class="field" style="top: 45.5%; left: 72%; width: 22%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
+  <!-- 특이사항 -->
+  <textarea class="field" style="top: 45.5%; left: 72%; width: 22%; height: 16%; resize:none; line-height:1.5; font-size:14px; text-align: left;"></textarea>
   
-  <!-- 종합의견 (특이사항과 동일하게 14px로 유지) -->
+  <!-- 종합의견 -->
   <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11.5%; resize:none; line-height:1.5; font-size:14px; text-align: left; overflow: hidden; white-space: pre-wrap; word-break: break-all;"></textarea>
 
   <canvas id="sig1" class="sig-canvas" style="top: 87%; left: 17%; width: 21%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
@@ -201,6 +211,8 @@
   </div>
   
   <button class="btn-save" onclick="savePDF()">점검표 자동 보관하기 (PDF 전송)</button>
+  <!-- ★ 새롭게 추가된 앱 설치 버튼 ★ -->
+  <button class="btn-install" onclick="showInstallGuide()">📱 홈 화면에 앱으로 설치하기</button>
 </div>
 
 <div id="sigModal" class="modal-overlay">
@@ -251,7 +263,7 @@
     selectElement.value = '';
   }
 
-  // ================= 서명 모달 로직 (흔들림 완벽 원복) =================
+  // ================= 서명 모달 로직 =================
   let currentTargetCanvasId = null;
   const savedSignatures = { sig1: null, sig2: null };
   const modalCanvas = document.getElementById('modalCanvas');
@@ -285,7 +297,6 @@
     currentTargetCanvasId = targetId;
     document.getElementById('modalTitle').innerText = title;
     
-    // 이전에 완벽하게 작동했던 깔끔한 클래스 추가 방식
     document.body.classList.add('modal-open');
     modalOverlay.style.display = 'flex';
 
@@ -360,7 +371,21 @@
   window.addEventListener('resize', () => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); });
   setTimeout(() => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); }, 300);
 
-  // ================= ★ 텍스트 하단 잘림 해결 및 PDF 생성 ★ =================
+  // ================= ★ 기기별 앱 설치 안내 로직 ★ =================
+  function showInstallGuide() {
+    alert(
+      "[스마트폰/태블릿 바탕화면에 앱 설치하는 방법]\n\n" +
+      "▶ 삼성 인터넷 / 구글 크롬 (안드로이드)\n" +
+      "1. 우측 하단(三) 또는 상단(⋮) 메뉴 버튼 터치\n" +
+      "2. '홈 화면에 추가' 또는 '앱 설치' 터치\n\n" +
+      "▶ 사파리 (아이폰/아이패드)\n" +
+      "1. 하단 가운데 네모 화살표(공유) 버튼 터치\n" +
+      "2. 메뉴를 아래로 내려 '홈 화면에 추가' 터치\n\n" +
+      "※ 아이콘이 생성되어 진짜 앱처럼 사용할 수 있습니다!"
+    );
+  }
+
+  // ================= ★ 폰트 강제 고정 및 PDF 생성 ★ =================
   function savePDF() {
     const googleAppScriptUrl = "https://script.google.com/macros/s/AKfycbxWYcxsEOm1rPRUVcUsbYHcoQGbVMpGsL3v6lfqm0hVMEFI11ogq8DC4YSfweZ2hJmy/exec";
     
@@ -391,7 +416,6 @@
     saveBtn.innerText = "PDF 생성 중 (잠시만 기다려주세요)...";
     saveBtn.disabled = true;
 
-    // 모든 textarea와 text input을 div로 완벽하게 복제 (숫자 하단 잘림 문제 원천 차단)
     const inputFields = element.querySelectorAll('textarea, input[type="text"]');
     const replacers = [];
     
@@ -407,7 +431,12 @@
       
       if (field.tagName.toLowerCase() === 'textarea') {
         div.style.whiteSpace = "pre-wrap";       
-        div.style.wordBreak = "break-all";     
+        div.style.wordBreak = "break-all";
+        
+        // ★ 특이사항과 종합의견 모두 글씨크기 14px, 줄간격 1.5로 완벽 동기화 ★
+        div.style.fontSize = "14px";
+        div.style.lineHeight = "1.5";
+        
         let safeText = field.value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         div.innerHTML = safeText.replace(/\n/g, '<br>');
       } else {
@@ -440,7 +469,6 @@
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
       const pdfBase64 = pdf.output('datauristring');
 
-      // 변환 완료 후 원래 입력창으로 복구
       replacers.forEach(rep => {
         rep.div.parentNode.removeChild(rep.div);
         rep.field.style.display = '';
