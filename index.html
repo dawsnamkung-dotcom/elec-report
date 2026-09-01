@@ -8,11 +8,11 @@
   <style>
     body { background: #e9ecef; margin: 0; padding: 10px; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
     
-    /* 양식 배경 컨테이너 (너비 800px 기준) */
+    /* 양식 배경 컨테이너 */
     .form-container { position: relative; max-width: 800px; margin: 0 auto; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     .bg-image { width: 100%; display: block; pointer-events: none; }
     
-    /* 텍스트 입력 필드 (작업용 파란색 반투명) */
+    /* 텍스트 입력 필드 */
     .field { 
         position: absolute; 
         background: rgba(230, 240, 255, 0.6); 
@@ -40,90 +40,145 @@
     }
     .check-field:active { background: rgba(150, 190, 255, 0.8); }
     
-    /* 서명 캔버스 */
-    .sig-canvas { position: absolute; touch-action: none; border: 1px dashed #ffa500; background: rgba(255, 255, 255, 0.3); }
+    /* 서명 캔버스 (클릭 가능 표시) */
+    .sig-canvas { 
+        position: absolute; 
+        border: 1px dashed #007bff; 
+        background: rgba(230, 240, 255, 0.4); 
+        cursor: pointer; 
+        transition: background 0.2s;
+    }
+    .sig-canvas:hover { background: rgba(200, 225, 255, 0.7); }
     
-    /* ★ 인쇄/PDF 저장 시 파란 배경 및 테두리를 모두 숨기는 마법의 클래스 ★ */
+    /* PDF 저장 시 파란 배경 및 테두리 투명화 */
     .print-mode .field { background: transparent !important; border: none !important; }
     .print-mode .check-field { background: transparent !important; border: none !important; }
     .print-mode .sig-canvas { border: none !important; background: transparent !important; }
     
-    .btn-bar { text-align: center; margin: 20px 0; }
-    .btn-save { padding: 15px 30px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    /* 하단 조작 영역 */
+    .controls-bar { max-width: 800px; margin: 15px auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .controls-group { margin-bottom: 12px; }
+    .controls-group label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 14px; color: #333; }
+    .controls-group select { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #007bff; border-radius: 4px; background-color: #f8f9fa; }
+    
+    .btn-save { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .btn-save:active { background: #0056b3; }
+
+    /* ================= 서명 모달 팝업 스타일 ================= */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        display: none; justify-content: center; align-items: center;
+        z-index: 9999;
+    }
+    .modal-content {
+        background: #fff; width: 90%; max-width: 600px;
+        padding: 20px; border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3); text-align: center;
+    }
+    .modal-title { margin: 0 0 8px 0; font-size: 20px; color: #222; }
+    .modal-desc { margin: 0 0 15px 0; font-size: 13px; color: #666; }
+    .modal-canvas-wrap {
+        width: 100%; height: 260px; border: 2px dashed #007bff;
+        border-radius: 8px; background: #fafafa; position: relative;
+        margin-bottom: 15px; box-sizing: border-box;
+    }
+    #modalCanvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+    .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-btns button {
+        padding: 12px 20px; font-size: 15px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;
+    }
+    .btn-modal-clear { background: #6c757d; color: white; }
+    .btn-modal-cancel { background: #dc3545; color: white; }
+    .btn-modal-confirm { background: #28a745; color: white; flex: 1; }
   </style>
 </head>
 <body>
 
 <div class="form-container" id="pdf-area">
-  <!-- 배경 이미지 (폴더에 있는 이미지 파일명과 똑같이 맞춰주세요) -->
-  <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표">
+  <img src="1000093837.jpg" class="bg-image" alt="전기설비 점검기록표">
 
-  <!-- ================= 상단 정보 ================= -->
-  <!-- 년, 월, 일 -->
-  <input type="text" class="field" style="top: 12.1%; left: 16%; width: 4.5%; text-align:center;">
-  <input type="text" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%; text-align:center;">
-  <input type="text" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 16%; width: 4.5%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%; text-align:center;">
 
-  <!-- 수용가명 -->
   <input type="text" class="field" style="top: 15.1%; left: 12.5%; width: 34.5%;">
 
-  <!-- 수전전압/수전전력, 발전전압/발전전력 -->
-  <input type="text" class="field" style="top: 15.1%; left: 56.5%; width: 9%;">
-  <input type="text" class="field" style="top: 15.1%; left: 77.5%; width: 9%;">
-  <input type="text" class="field" style="top: 17.5%; left: 56.5%; width: 9%;">
-  <input type="text" class="field" style="top: 17.5%; left: 77.5%; width: 9%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 56.5%; width: 9%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 77.5%; width: 9%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 56.5%; width: 9%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 77.5%; width: 9%;">
 
-  <!-- ================= 점검 항목 (자동 생성 구역) ================= -->
   <div id="check-items-container"></div>
   
-  <!-- 제2종 접지전류 mA (텍스트 입력) -->
-  <input type="text" class="field" style="top: 41.2%; left: 88.5%; width: 5%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 41.2%; left: 88.5%; width: 5%; text-align:center;" value="0">
 
-  <!-- ================= 전력량계 지침 ================= -->
-  <!-- 유효전력 (주간, 저녁, 심야) -->
-  <input type="text" class="field" style="top: 43.6%; left: 46.5%; width: 25.5%;">
-  <input type="text" class="field" style="top: 45.9%; left: 46.5%; width: 25.5%;">
-  <input type="text" class="field" style="top: 48.2%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 43.6%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 45.9%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 48.2%; left: 46.5%; width: 25.5%;">
   
-  <!-- 최대전력 (주간, 저녁) -->
-  <input type="text" class="field" style="top: 50.5%; left: 46.5%; width: 25.5%;">
-  <input type="text" class="field" style="top: 52.8%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 50.5%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 52.8%; left: 46.5%; width: 25.5%;">
   
-  <!-- 무효전력 (주간, 저녁) -->
-  <input type="text" class="field" style="top: 55.1%; left: 46.5%; width: 25.5%;">
-  <input type="text" class="field" style="top: 57.4%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 55.1%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 57.4%; left: 46.5%; width: 25.5%;">
 
-  <!-- 전압, 전류, 역률 -->
-  <input type="text" class="field" style="top: 59.8%; left: 12%; width: 10%; text-align:center;">
-  <input type="text" class="field" style="top: 59.8%; left: 35.5%; width: 10%; text-align:center;">
-  <input type="text" class="field" style="top: 59.8%; left: 60.5%; width: 10%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 12%; width: 10%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 60.5%; width: 10%; text-align:center;">
 
-  <!-- ================= 특이사항 및 종합의견 ================= -->
-  <!-- 특이사항 -->
   <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5;"></textarea>
-  <!-- 종합 의견 -->
-  <textarea class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5;"></textarea>
+  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5;"></textarea>
 
-  <!-- ================= 서명 캔버스 ================= -->
-  <canvas id="sig1" class="sig-canvas" style="top: 91.5%; left: 17%; width: 19%; height: 4.5%;"></canvas>
-  <canvas id="sig2" class="sig-canvas" style="top: 91.5%; left: 59%; width: 19%; height: 4.5%;"></canvas>
+  <canvas id="sig1" class="sig-canvas" style="top: 91.5%; left: 17%; width: 19%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
+  <canvas id="sig2" class="sig-canvas" style="top: 91.5%; left: 59%; width: 19%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
 
-<div class="btn-bar">
+<div class="controls-bar">
+  <div class="controls-group">
+    <label for="opinionSelect">📝 종합의견 항목 선택</label>
+    <select id="opinionSelect" onchange="handleOpinionSelect(this.value)">
+      <option value="">-- 종합의견 선택하세요 --</option>
+      <option value="특고압 수전설비 외관점검 (AISS, MOF, TR, PF, LA 등) 이상소음, 이음누유, 변색, 냄새 등 - 양호">0. 특고압 수전설비 외관점검 - 양호</option>
+      <option value="각 분전함내 간선열화상태 및 차단기 단자 육안점검 - 양호">1. 각 분전함내 간선열화상태 및 차단기 단자 육안점검 - 양호</option>
+      <option value="ELD 누전경보기 점검 - 양호">2. ELD 누전경보기 점검 - 양호</option>
+      <option value="전력콘덴서 및 진상 지상 역률 점검 - 양호">3. 전력콘덴서 및 진상 지상 역률 점검 - 양호</option>
+      <option value="분전함 및 전기기계기구 접지선 탈락,단선 등 점검 - 양호">4. 분전함 및 전기기계기구 접지선 탈락,단선 등 점검 - 양호</option>
+      <option value="화재위험안전점검 (먼지, 분전함내 인화물질, 문어발식, 콘센트용량 과다여부, 콘센트접지) - 양호">5. 화재위험안전점검 - 양호</option>
+      <option value="분전함 내 차단기 나사조임 - 양호">6. 분전함 내 차단기 나사조임 - 양호</option>
+      <option value="차단기 월 1회 동작여부확인후 부동작시 교체요망 - 양호">7. 차단기 월 1회 동작여부확인후 부동작시 교체요망 - 양호</option>
+      <option value="전선 종류와 굵기 및 차단기용량 과다여부 - 양호">8. 전선 종류와 굵기 및 차단기용량 과다여부 - 양호</option>
+      <option value="CUSTOM">9. 기타 (직접 입력)</option>
+    </select>
+  </div>
+  
   <button class="btn-save" onclick="savePDF()">점검표 저장 및 PDF 다운로드</button>
 </div>
 
+<div id="sigModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3 id="modalTitle" class="modal-title">성명 및 서명</h3>
+    <p class="modal-desc">손가락이나 펜으로 성명과 서명을 크게 작성해 주세요.</p>
+    <div class="modal-canvas-wrap">
+      <canvas id="modalCanvas"></canvas>
+    </div>
+    <div class="modal-btns">
+      <button type="button" class="btn-modal-clear" onclick="clearModalCanvas()">지우기</button>
+      <button type="button" class="btn-modal-cancel" onclick="closeModal()">취소</button>
+      <button type="button" class="btn-modal-confirm" onclick="applySignature()">서명 완료</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  // 1. 점검 항목 31개 자동 배치 스크립트 (좌표 계산)
+  // 1. 점검 항목 31개 자동 배치
   const checkContainer = document.getElementById('check-items-container');
-  const startY = 24.3; // 첫 줄의 세로 위치(%)
-  const gapY = 2.42;   // 줄 간격(%)
-  const xPositions = [21.5, 46.3, 71.3, 95.8]; // 가로 4열의 위치(%)
+  const startY = 24.3;
+  const gapY = 2.42;
+  const xPositions = [21.5, 46.3, 71.3, 95.8];
   
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 4; col++) {
-      // 마지막 제2종 접지전류 칸은 텍스트 입력이므로 버튼 생성 제외
       if (row === 7 && col === 3) continue; 
       
       let div = document.createElement('div');
@@ -132,7 +187,7 @@
       div.style.left = xPositions[col] + '%';
       div.style.width = '3.5%';
       div.style.height = '2.2%';
-      div.innerText = 'O'; // 기본값 세팅
+      div.innerText = 'O';
       div.onclick = function() {
         if (this.innerText === 'O') this.innerText = 'X';
         else if (this.innerText === 'X') this.innerText = '/';
@@ -142,48 +197,120 @@
     }
   }
 
-  // 2. 태블릿 펜/터치 서명 기능 활성화
-  function setupCanvas(canvasId) {
+  // 2. 종합의견 선택 처리 함수
+  function handleOpinionSelect(selectedValue) {
+    const opinionTextarea = document.getElementById('opinionText');
+    if (selectedValue === 'CUSTOM') {
+      opinionTextarea.value = '';
+      opinionTextarea.focus();
+    } else if (selectedValue !== '') {
+      opinionTextarea.value = selectedValue;
+    }
+  }
+
+  // ================= 3. 서명 모달 및 저장 로직 =================
+  let currentTargetCanvasId = null;
+  const savedSignatures = { sig1: null, sig2: null };
+  const modalCanvas = document.getElementById('modalCanvas');
+  const modalCtx = modalCanvas.getContext('2d');
+  let isModalDrawing = false;
+
+  // 모달 캔버스 그리기 이벤트 등록
+  function getModalPos(e) {
+    const rect = modalCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  function startModalDraw(e) { isModalDrawing = true; const p = getModalPos(e); modalCtx.beginPath(); modalCtx.moveTo(p.x, p.y); }
+  function drawModal(e) { if (!isModalDrawing) return; const p = getModalPos(e); modalCtx.lineTo(p.x, p.y); modalCtx.stroke(); }
+  function endModalDraw() { isModalDrawing = false; }
+
+  modalCanvas.addEventListener('mousedown', startModalDraw);
+  modalCanvas.addEventListener('mousemove', drawModal);
+  window.addEventListener('mouseup', endModalDraw);
+
+  modalCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startModalDraw(e); }, { passive: false });
+  modalCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); drawModal(e); }, { passive: false });
+  modalCanvas.addEventListener('touchend', endModalDraw);
+
+  function openSigModal(targetId, title) {
+    currentTargetCanvasId = targetId;
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('sigModal').style.display = 'flex';
+
+    setTimeout(() => {
+      const rect = modalCanvas.parentElement.getBoundingClientRect();
+      modalCanvas.width = rect.width;
+      modalCanvas.height = rect.height;
+      modalCtx.lineWidth = 3;
+      modalCtx.lineCap = 'round';
+      modalCtx.strokeStyle = '#000';
+      clearModalCanvas();
+
+      // 기존 저장된 서명이 있으면 불러와서 표시
+      if (savedSignatures[currentTargetCanvasId]) {
+        const img = new Image();
+        img.onload = () => modalCtx.drawImage(img, 0, 0, modalCanvas.width, modalCanvas.height);
+        img.src = savedSignatures[currentTargetCanvasId];
+      }
+    }, 100);
+  }
+
+  function closeModal() {
+    document.getElementById('sigModal').style.display = 'none';
+  }
+
+  function clearModalCanvas() {
+    modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height);
+  }
+
+  function applySignature() {
+    if (!currentTargetCanvasId) return;
+    
+    // 모달 캔버스의 서명을 이미지 URL로 저장
+    const dataUrl = modalCanvas.toDataURL();
+    savedSignatures[currentTargetCanvasId] = dataUrl;
+    
+    // 양식 상의 소형 캔버스에 그리기
+    renderTargetCanvas(currentTargetCanvasId);
+    closeModal();
+  }
+
+  function renderTargetCanvas(canvasId) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
-    let isDrawing = false;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
 
-    function resize() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = '#000';
+    if (savedSignatures[canvasId]) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.src = savedSignatures[canvasId];
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-    window.addEventListener('resize', resize);
-    setTimeout(resize, 100);
-
-    function getPos(e) {
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-
-    canvas.addEventListener('mousedown', (e) => { isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
-    canvas.addEventListener('mousemove', (e) => { if (isDrawing) { const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }});
-    window.addEventListener('mouseup', () => isDrawing = false);
-    
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, {passive: false});
-    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if (isDrawing) { const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }}, {passive: false});
-    canvas.addEventListener('touchend', () => isDrawing = false);
   }
-  
-  setupCanvas('sig1'); // 점검자 서명
-  setupCanvas('sig2'); // 확인자 서명
 
-  // 3. PDF 저장 및 파란색 가이드 숨기기 기능
+  // 화면 크기 조정 시 서명 재렌더링
+  window.addEventListener('resize', () => {
+    renderTargetCanvas('sig1');
+    renderTargetCanvas('sig2');
+  });
+
+  // 초기 캔버스 사이즈 세팅
+  setTimeout(() => {
+    renderTargetCanvas('sig1');
+    renderTargetCanvas('sig2');
+  }, 300);
+
+  // 4. PDF 저장 로직
   function savePDF() {
     const element = document.getElementById('pdf-area');
     const saveBtn = document.querySelector('.btn-save');
     
-    // PDF 렌더링 직전에 파란색 배경과 테두리를 투명하게 만듦
     element.classList.add('print-mode');
     saveBtn.innerText = "PDF 변환 중...";
     saveBtn.disabled = true;
@@ -197,7 +324,6 @@
     };
 
     html2pdf().set(opt).from(element).save().then(() => {
-      // 저장이 끝나면 다시 파란 박스가 보이도록 원상 복구
       element.classList.remove('print-mode');
       saveBtn.innerText = "점검표 저장 및 PDF 다운로드";
       saveBtn.disabled = false;
