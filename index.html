@@ -96,23 +96,30 @@
 <body>
 
 <div class="form-container" id="pdf-area">
-  <img src="1000093837.jpg" class="bg-image" alt="전기설비 점검기록표">
+  <!-- 파일명 수정됨: form_bg.jpg -->
+  <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표">
 
+  <!-- ================= 상단 정보 (숫자 키보드) ================= -->
   <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 16%; width: 4.5%; text-align:center;">
   <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%; text-align:center;">
   <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%; text-align:center;">
 
+  <!-- 수용가명 -->
   <input type="text" class="field" style="top: 15.1%; left: 12.5%; width: 34.5%;">
 
+  <!-- 수전전압/수전전력, 발전전압/발전전력 (숫자 키보드) -->
   <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 56.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 77.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 56.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 77.5%; width: 9%;">
 
+  <!-- ================= 점검 항목 구역 ================= -->
   <div id="check-items-container"></div>
   
+  <!-- 제2종 접지전류 mA (기본값 0 세팅) -->
   <input type="text" inputmode="numeric" class="field" style="top: 41.2%; left: 88.5%; width: 5%; text-align:center;" value="0">
 
+  <!-- ================= 전력량계 지침 (숫자 키보드) ================= -->
   <input type="text" inputmode="numeric" class="field" style="top: 43.6%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 45.9%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 48.2%; left: 46.5%; width: 25.5%;">
@@ -123,17 +130,21 @@
   <input type="text" inputmode="numeric" class="field" style="top: 55.1%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 57.4%; left: 46.5%; width: 25.5%;">
 
+  <!-- 전압, 전류, 역률 -->
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 12%; width: 10%; text-align:center;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%; text-align:center;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 60.5%; width: 10%; text-align:center;">
 
+  <!-- ================= 특이사항 및 종합의견 ================= -->
   <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5;"></textarea>
   <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5;"></textarea>
 
+  <!-- ================= 서명 캔버스 (클릭 시 확대 모달 실행) ================= -->
   <canvas id="sig1" class="sig-canvas" style="top: 91.5%; left: 17%; width: 19%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
   <canvas id="sig2" class="sig-canvas" style="top: 91.5%; left: 59%; width: 19%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
 
+<!-- 하단 조작 컨트롤바 -->
 <div class="controls-bar">
   <div class="controls-group">
     <label for="opinionSelect">📝 종합의견 항목 선택</label>
@@ -155,6 +166,7 @@
   <button class="btn-save" onclick="savePDF()">점검표 저장 및 PDF 다운로드</button>
 </div>
 
+<!-- ================= 대형 서명 팝업 모달 ================= -->
 <div id="sigModal" class="modal-overlay">
   <div class="modal-content">
     <h3 id="modalTitle" class="modal-title">성명 및 서명</h3>
