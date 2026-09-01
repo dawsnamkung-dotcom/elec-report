@@ -15,7 +15,7 @@
     .form-container { position: relative; max-width: 800px; margin: 0 auto; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     .bg-image { width: 100%; display: block; pointer-events: none; }
     
-    /* 텍스트 입력 필드 (기본: 가운데 정렬 적용) */
+    /* 텍스트 입력 필드 */
     .field { 
         position: absolute; 
         background: rgba(230, 240, 255, 0.6); 
@@ -25,7 +25,7 @@
         padding: 2px 4px;
         color: #000;
         border-radius: 2px;
-        text-align: center; /* 기본적으로 모든 입력창 가운데 정렬 */
+        text-align: center;
     }
     .field:focus { background: rgba(255, 255, 255, 0.95); border: 2px solid #1e90ff; outline: none; z-index: 10;}
     
@@ -89,13 +89,16 @@
         margin-bottom: 15px; box-sizing: border-box;
     }
     #modalCanvas { width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
-    .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+    
+    /* 모달 하단 버튼 스타일 */
+    .modal-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
     .modal-btns button {
-        padding: 12px 20px; font-size: 15px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;
+        padding: 12px 15px; font-size: 14px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;
     }
+    .btn-modal-upload { background: #17a2b8; color: white; }
     .btn-modal-clear { background: #6c757d; color: white; }
     .btn-modal-cancel { background: #dc3545; color: white; }
-    .btn-modal-confirm { background: #28a745; color: white; flex: 1; }
+    .btn-modal-confirm { background: #28a745; color: white; flex: 1; min-width: 100px; }
   </style>
 </head>
 <body>
@@ -103,15 +106,15 @@
 <div class="form-container" id="pdf-area">
   <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표">
 
-  <!-- ================= 상단 정보 (가운데 정렬) ================= -->
-  <input type="text" inputmode="numeric" class="field" style="top: 16%; left: 19%; width: 4.5%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%;">
+  <!-- ================= 상단 정보 ================= -->
+  <input type="text" id="yearInput" inputmode="numeric" class="field" style="top: 12.1%; left: 16%; width: 4.5%;">
+  <input type="text" id="monthInput" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%;">
+  <input type="text" id="dayInput" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%;">
 
-  <!-- 수용가명 (가운데 정렬) -->
-  <input type="text" class="field" style="top: 15.1%; left: 12.5%; width: 34.5%;">
+  <!-- 수용가명 -->
+  <input type="text" id="custNameInput" class="field" style="top: 15.1%; left: 12.5%; width: 34.5%;">
 
-  <!-- 수전전압/수전전력, 발전전압/발전전력 (가운데 정렬) -->
+  <!-- 수전전압/수전전력, 발전전압/발전전력 -->
   <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 56.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 77.5%; width: 9%;">
   <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 56.5%; width: 9%;">
@@ -120,10 +123,10 @@
   <!-- ================= 점검 항목 구역 ================= -->
   <div id="check-items-container"></div>
   
-  <!-- 제2종 접지전류 mA (기본값 0, 가운데 정렬) -->
+  <!-- 제2종 접지전류 mA (기본값 0) -->
   <input type="text" inputmode="numeric" class="field" style="top: 41.2%; left: 88.5%; width: 5%;" value="0">
 
-  <!-- ================= 전력량계 지침 (가운데 정렬) ================= -->
+  <!-- ================= 전력량계 지침 ================= -->
   <input type="text" inputmode="numeric" class="field" style="top: 43.6%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 45.9%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 48.2%; left: 46.5%; width: 25.5%;">
@@ -134,16 +137,13 @@
   <input type="text" inputmode="numeric" class="field" style="top: 55.1%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 57.4%; left: 46.5%; width: 25.5%;">
 
-  <!-- 전압, 전류, 역률 (가운데 정렬) -->
+  <!-- 전압, 전류, 역률 -->
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 12%; width: 10%;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 60.5%; width: 10%;">
 
-  <!-- ================= 특이사항 및 종합의견 (좌측 정렬 유지) ================= -->
-  <!-- 특이사항 (좌측 정렬) -->
+  <!-- ================= 특이사항 및 종합의견 ================= -->
   <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
-  
-  <!-- 종합의견 (좌측 정렬) -->
   <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5; font-size:14px; text-align: left;"></textarea>
 
   <!-- ================= 서명 캔버스 ================= -->
@@ -174,18 +174,23 @@
     </select>
   </div>
   
-  <button class="btn-save" onclick="savePDF()">점검표 저장 및 PDF 다운로드</button>
+  <button class="btn-save" onclick="savePDF()">점검표 자동 보관하기 (PDF 전송)</button>
 </div>
 
 <!-- ================= 대형 서명 팝업 모달 ================= -->
 <div id="sigModal" class="modal-overlay">
   <div class="modal-content">
     <h3 id="modalTitle" class="modal-title">성명 및 서명</h3>
-    <p class="modal-desc">손가락이나 펜으로 성명과 서명을 크게 작성해 주세요.</p>
+    <p class="modal-desc">직접 서명하거나 미리 찍어둔 사진을 불러올 수 있습니다.</p>
     <div class="modal-canvas-wrap">
       <canvas id="modalCanvas"></canvas>
     </div>
+    
+    <!-- 사진 업로드용 숨김 인풋 -->
+    <input type="file" id="sigUploadInput" accept="image/*" style="display: none;" onchange="handleSigImageUpload(event)">
+    
     <div class="modal-btns">
+      <button type="button" class="btn-modal-upload" onclick="document.getElementById('sigUploadInput').click()">사진 불러오기</button>
       <button type="button" class="btn-modal-clear" onclick="clearModalCanvas()">지우기</button>
       <button type="button" class="btn-modal-cancel" onclick="closeModal()">취소</button>
       <button type="button" class="btn-modal-confirm" onclick="applySignature()">서명 완료</button>
@@ -220,7 +225,7 @@
     }
   }
 
-  // 2. 종합의견 다중 선택 처리 함수 (자동 번호 추가 반영)
+  // 2. 종합의견 다중 선택 처리 함수 (자동 번호 추가)
   function handleOpinionSelect(selectedValue) {
     const opinionTextarea = document.getElementById('opinionText');
     const selectElement = document.getElementById('opinionSelect');
@@ -228,15 +233,11 @@
     if (selectedValue === 'CUSTOM') {
       opinionTextarea.focus();
     } else if (selectedValue !== '') {
-      // 이미 같은 내용이 들어있는지 확인 (중복 방지용, 앞의 숫자 제외하고 내용만 비교)
       if (!opinionTextarea.value.includes(selectedValue)) {
-        
-        // 현재 텍스트상자에 있는 줄 수를 계산 (빈 줄은 무시)
         const currentLines = opinionTextarea.value.split('\n').filter(line => line.trim() !== '');
-        const nextNumber = currentLines.length + 1; // 다음 번호 계산
-        const newText = nextNumber + ". " + selectedValue; // 번호와 내용 합치기
+        const nextNumber = currentLines.length + 1;
+        const newText = nextNumber + ". " + selectedValue;
 
-        // 텍스트상자가 비어있으면 바로 넣고, 아니면 줄바꿈 후 추가
         if (opinionTextarea.value.trim() === '') {
           opinionTextarea.value = newText;
         } else {
@@ -244,7 +245,7 @@
         }
       }
     }
-    selectElement.value = ''; // 드롭다운 초기화
+    selectElement.value = '';
   }
 
   // ================= 3. 서명 모달 및 스크롤 방지 로직 =================
@@ -308,6 +309,32 @@
   
   function clearModalCanvas() { modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height); }
 
+  // 서명 사진 불러오기 로직
+  function handleSigImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        clearModalCanvas();
+        
+        // 캔버스 크기에 맞춰 비율을 유지하며 중앙에 그림
+        const scale = Math.min(modalCanvas.width / img.width, modalCanvas.height / img.height);
+        const x = (modalCanvas.width / 2) - (img.width / 2) * scale;
+        const y = (modalCanvas.height / 2) - (img.height / 2) * scale;
+        
+        modalCtx.drawImage(img, x, y, img.width * scale, img.height * scale);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    
+    // 같은 파일을 또 고를 수 있도록 input 초기화
+    event.target.value = '';
+  }
+
   function applySignature() {
     if (!currentTargetCanvasId) return;
     const dataUrl = modalCanvas.toDataURL();
@@ -335,27 +362,81 @@
   window.addEventListener('resize', () => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); });
   setTimeout(() => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); }, 300);
 
-  // 4. PDF 저장 로직
+  // ================= 4. PDF 구글 드라이브 자동 저장 및 동적 파일명 로직 =================
   function savePDF() {
+    // ★ 주의: 이전에 안내해드린 구글 앱스 스크립트(웹앱) URL을 아래 따옴표 안에 반드시 넣어주세요! ★
+    const googleAppScriptUrl = "https://script.google.com/macros/s/AKfycbxWYcxsEOm1rPRUVcUsbYHcoQGbVMpGsL3v6lfqm0hVMEFI11ogq8DC4YSfweZ2hJmy/exec";
+    
+    if (googleAppScriptUrl === "여기에_웹앱_URL을_붙여넣으세요") {
+      alert("HTML 코드 마지막 부분에 구글 웹 앱 URL을 먼저 입력해주세요!");
+      return;
+    }
+
     const element = document.getElementById('pdf-area');
     const saveBtn = document.querySelector('.btn-save');
     
+    const custName = document.getElementById('custNameInput').value.trim() || '수용가';
+    const yearVal = document.getElementById('yearInput').value.trim();
+    const monthVal = document.getElementById('monthInput').value.trim();
+    const dayVal = document.getElementById('dayInput').value.trim();
+
+    let dateStr = '';
+    if (yearVal || monthVal || dayVal) {
+      const fullYear = yearVal ? (yearVal.length === 2 ? '20' + yearVal : yearVal) : '';
+      const formattedMonth = monthVal ? monthVal.padStart(2, '0') : '';
+      const formattedDay = dayVal ? dayVal.padStart(2, '0') : '';
+      dateStr = `_${fullYear}${formattedMonth}${formattedDay}`;
+    } else {
+      const today = new Date();
+      const y = today.getFullYear();
+      const m = String(today.getMonth() + 1).padStart(2, '0');
+      const d = String(today.getDate()).padStart(2, '0');
+      dateStr = `_${y}${m}${d}`;
+    }
+
+    const dynamicFileName = `전기설비점검기록표_${custName}${dateStr}.pdf`;
+
     element.classList.add('print-mode');
-    saveBtn.innerText = "PDF 변환 중...";
+    saveBtn.innerText = "구글 드라이브로 PDF 전송 중...";
     saveBtn.disabled = true;
     
     const opt = {
       margin: 0,
-      filename: '전기설비점검기록표.pdf',
+      filename: dynamicFileName,
       image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    html2pdf().set(opt).from(element).save().then(() => {
-      element.classList.remove('print-mode');
-      saveBtn.innerText = "점검표 저장 및 PDF 다운로드";
-      saveBtn.disabled = false;
+    // PDF 렌더링 후 구글 서버로 자동 전송
+    html2pdf().set(opt).from(element).outputPdf('datauristring').then(function(pdfBase64) {
+      
+      const payload = {
+        fileName: dynamicFileName,
+        fileData: pdfBase64
+      };
+
+      fetch(googleAppScriptUrl, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.result === 'success') {
+          alert("구글 드라이브 해당 날짜 폴더에 성공적으로 보관되었습니다.");
+        } else {
+          alert("저장 실패: " + result.message);
+        }
+      })
+      .catch(error => {
+        alert("서버 전송 중 오류가 발생했습니다.");
+        console.error(error);
+      })
+      .finally(() => {
+        element.classList.remove('print-mode');
+        saveBtn.innerText = "점검표 자동 보관하기 (PDF 전송)";
+        saveBtn.disabled = false;
+      });
     });
   }
 </script>
