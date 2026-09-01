@@ -106,52 +106,79 @@
 <div class="form-container" id="pdf-area">
   <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표">
 
-  <!-- ================= 상단 정보 ================= -->
-  <input type="text" id="yearInput" inputmode="numeric" class="field" style="top: 12.1%; left: 16%; width: 4.5%;">
-  <input type="text" id="monthInput" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%;">
-  <input type="text" id="dayInput" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%;">
+  <input type="text" id="yearInput" inputmode="numeric" class="field" style="top: 16%; left: 19%; width: 4.5%;">
+  <input type="text" id="monthInput" inputmode="numeric" class="field" style="top: 16%; left: 27%; width: 4.5%;">
+  <input type="text" id="dayInput" inputmode="numeric" class="field" style="top: 16%; left: 35%; width: 4.5%;">
 
-  <!-- 수용가명 -->
-  <input type="text" id="custNameInput" class="field" style="top: 15.1%; left: 12.5%; width: 34.5%;">
+  <input type="text" id="custNameInput" class="field" style="top: 19%; left: 13.5%; width: 34.5%;">
 
-  <!-- 수전전압/수전전력, 발전전압/발전전력 -->
-  <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 56.5%; width: 9%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 15.1%; left: 77.5%; width: 9%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 56.5%; width: 9%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 17.5%; left: 77.5%; width: 9%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 18.1%; left: 60%; width: 9%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 18.1%; left: 82%; width: 9%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 19.8%; left: 60%; width: 9%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 19.8%; left: 82%; width: 9%;">
 
-  <!-- ================= 점검 항목 구역 ================= -->
-  <div id="check-items-container"></div>
+  <div class="check-field" style="top: 27.3%; left: 20%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 27.3%; left: 42.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 27.3%; left: 65%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 27.3%; left: 87.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+
+  <div class="check-field" style="top: 29.3%; left: 20%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 29.3%; left: 42.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 29.3%; left: 65%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 29.3%; left: 87.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+
+  <div class="check-field" style="top: 31.3%; left: 20%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 31.3%; left: 42.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 31.3%; left: 65%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 31.3%; left: 87.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+
+  <div class="check-field" style="top: 33.3%; left: 20%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 33.3%; left: 42.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 33.3%; left: 65%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 33.3%; left: 87.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+
+  <div class="check-field" style="top: 35.3%; left: 20%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 35.3%%; left: 42.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 35.3%; left: 65%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 35.3%; left: 87.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+
+  <div class="check-field" style="top: 37.3%; left: 20%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 37.3%; left: 42.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 37.3%; left: 65%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 37.3%; left: 87.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+
+  <div class="check-field" style="top: 39.3%; left: 20%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 39.3%; left: 42.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 39.3%; left: 65%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 39.3%; left: 87.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+
+  <div class="check-field" style="top: 41.3%; left: 20%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 41.3%; left: 42.5%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
+  <div class="check-field" style="top: 41.3%; left: 65%; width: 3.5%; height: 2.2%;" onclick="toggleCheck(this)">O</div>
   
-  <!-- 제2종 접지전류 mA (기본값 0) -->
-  <input type="text" inputmode="numeric" class="field" style="top: 41.2%; left: 88.5%; width: 5%;" value="0">
+  <input type="text" inputmode="numeric" class="field" style="top: 41.3%; left: 87.5%; width: 5%;" value="0">
 
-  <!-- ================= 전력량계 지침 ================= -->
-  <input type="text" inputmode="numeric" class="field" style="top: 43.6%; left: 46.5%; width: 25.5%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 45.9%; left: 46.5%; width: 25.5%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 48.2%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 45.6%; left: 35%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 47.6%; left: 35%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 49.6%; left: 35%; width: 25.5%;">
   
-  <input type="text" inputmode="numeric" class="field" style="top: 50.5%; left: 46.5%; width: 25.5%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 52.8%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 51.6%; left: 35%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 53.6%; left: 35%; width: 25.5%;">
   
-  <input type="text" inputmode="numeric" class="field" style="top: 55.1%; left: 46.5%; width: 25.5%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 57.4%; left: 46.5%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 55.6%; left: 35%; width: 25.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 57.6%; left: 35%; width: 25.5%;">
 
-  <!-- 전압, 전류, 역률 -->
-  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 12%; width: 10%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 60%; left: 13.5%; width: 10%;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%;">
-  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 60.5%; width: 10%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 59%; width: 10%;">
 
-  <!-- ================= 특이사항 및 종합의견 ================= -->
-  <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
+  <textarea class="field" style="top: 45.5%; left: 72%; width: 22%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
   <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5; font-size:14px; text-align: left;"></textarea>
 
-  <!-- ================= 서명 캔버스 ================= -->
-  <canvas id="sig1" class="sig-canvas" style="top: 91.5%; left: 17%; width: 19%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
-  <canvas id="sig2" class="sig-canvas" style="top: 91.5%; left: 59%; width: 19%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
+  <canvas id="sig1" class="sig-canvas" style="top: 88%; left: 17%; width: 21%; height: 3%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
+  <canvas id="sig2" class="sig-canvas" style="top: 88%; left: 65%; width: 21%; height: 3%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
 
-<!-- 하단 조작 컨트롤바 -->
 <div class="controls-bar">
   <div class="controls-group">
     <label for="opinionSelect">📝 종합의견 항목 선택 (다중 선택 가능)</label>
@@ -177,7 +204,6 @@
   <button class="btn-save" onclick="savePDF()">점검표 자동 보관하기 (PDF 전송)</button>
 </div>
 
-<!-- ================= 대형 서명 팝업 모달 ================= -->
 <div id="sigModal" class="modal-overlay">
   <div class="modal-content">
     <h3 id="modalTitle" class="modal-title">성명 및 서명</h3>
@@ -186,7 +212,6 @@
       <canvas id="modalCanvas"></canvas>
     </div>
     
-    <!-- 사진 업로드용 숨김 인풋 -->
     <input type="file" id="sigUploadInput" accept="image/*" style="display: none;" onchange="handleSigImageUpload(event)">
     
     <div class="modal-btns">
@@ -199,33 +224,14 @@
 </div>
 
 <script>
-  // 1. 점검 항목 31개 자동 배치
-  const checkContainer = document.getElementById('check-items-container');
-  const startY = 24.3;
-  const gapY = 2.42;
-  const xPositions = [21.5, 46.3, 71.3, 95.8];
-  
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 4; col++) {
-      if (row === 7 && col === 3) continue; 
-      
-      let div = document.createElement('div');
-      div.className = 'check-field';
-      div.style.top = (startY + (row * gapY)) + '%';
-      div.style.left = xPositions[col] + '%';
-      div.style.width = '3.5%';
-      div.style.height = '2.2%';
-      div.innerText = 'O';
-      div.onclick = function() {
-        if (this.innerText === 'O') this.innerText = 'X';
-        else if (this.innerText === 'X') this.innerText = '/';
-        else this.innerText = 'O';
-      };
-      checkContainer.appendChild(div);
-    }
+  // O, X, / 클릭 토글 함수
+  function toggleCheck(element) {
+    if (element.innerText === 'O') element.innerText = 'X';
+    else if (element.innerText === 'X') element.innerText = '/';
+    else element.innerText = 'O';
   }
 
-  // 2. 종합의견 다중 선택 처리 함수 (자동 번호 추가)
+  // 종합의견 다중 선택 처리 함수 (자동 번호 추가)
   function handleOpinionSelect(selectedValue) {
     const opinionTextarea = document.getElementById('opinionText');
     const selectElement = document.getElementById('opinionSelect');
@@ -248,7 +254,7 @@
     selectElement.value = '';
   }
 
-  // ================= 3. 서명 모달 및 스크롤 방지 로직 =================
+  // ================= 서명 모달 및 스크롤 방지 로직 =================
   let currentTargetCanvasId = null;
   const savedSignatures = { sig1: null, sig2: null };
   const modalCanvas = document.getElementById('modalCanvas');
@@ -309,7 +315,6 @@
   
   function clearModalCanvas() { modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height); }
 
-  // 서명 사진 불러오기 로직
   function handleSigImageUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -320,7 +325,6 @@
       img.onload = function() {
         clearModalCanvas();
         
-        // 캔버스 크기에 맞춰 비율을 유지하며 중앙에 그림
         const scale = Math.min(modalCanvas.width / img.width, modalCanvas.height / img.height);
         const x = (modalCanvas.width / 2) - (img.width / 2) * scale;
         const y = (modalCanvas.height / 2) - (img.height / 2) * scale;
@@ -330,8 +334,6 @@
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
-    
-    // 같은 파일을 또 고를 수 있도록 input 초기화
     event.target.value = '';
   }
 
@@ -362,16 +364,10 @@
   window.addEventListener('resize', () => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); });
   setTimeout(() => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); }, 300);
 
-  // ================= 4. PDF 구글 드라이브 자동 저장 및 동적 파일명 로직 =================
+  // ================= PDF 구글 드라이브 자동 저장 =================
   function savePDF() {
-    // ★ 주의: 이전에 안내해드린 구글 앱스 스크립트(웹앱) URL을 아래 따옴표 안에 반드시 넣어주세요! ★
     const googleAppScriptUrl = "https://script.google.com/macros/s/AKfycbxWYcxsEOm1rPRUVcUsbYHcoQGbVMpGsL3v6lfqm0hVMEFI11ogq8DC4YSfweZ2hJmy/exec";
     
-    if (googleAppScriptUrl === "여기에_웹앱_URL을_붙여넣으세요") {
-      alert("HTML 코드 마지막 부분에 구글 웹 앱 URL을 먼저 입력해주세요!");
-      return;
-    }
-
     const element = document.getElementById('pdf-area');
     const saveBtn = document.querySelector('.btn-save');
     
@@ -408,7 +404,6 @@
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // PDF 렌더링 후 구글 서버로 자동 전송
     html2pdf().set(opt).from(element).outputPdf('datauristring').then(function(pdfBase64) {
       
       const payload = {
