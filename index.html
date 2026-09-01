@@ -29,7 +29,7 @@
     }
     .field:focus { background: rgba(255, 255, 255, 0.95); border: 2px solid #1e90ff; outline: none; z-index: 10;}
     
-    /* O, X, / 토글 버튼 */
+    /* O, X, / 토글 버튼 (화면에서는 파란색) */
     .check-field { 
         position: absolute; 
         cursor: pointer; 
@@ -54,9 +54,10 @@
     }
     .sig-canvas:hover { background: rgba(200, 225, 255, 0.7); }
     
-    /* PDF 저장 시 파란 배경 및 테두리 투명화 */
-    .print-mode .field { background: transparent !important; border: none !important; }
-    .print-mode .check-field { background: transparent !important; border: none !important; }
+    /* ★ PDF 저장 시 강제 적용되는 마법의 클래스 ★ */
+    .form-container.print-mode { box-shadow: none !important; margin: 0 !important; border: none !important; } /* 2페이지 넘어감 원천 차단 */
+    .print-mode .field { background: transparent !important; border: none !important; color: #000 !important; } /* 글자 검은색 고정 */
+    .print-mode .check-field { background: transparent !important; border: none !important; color: #000 !important; } /* O/X 글자 검은색 고정 */
     .print-mode .sig-canvas { border: none !important; background: transparent !important; }
     
     /* 하단 조작 영역 */
@@ -173,10 +174,12 @@
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 59%; width: 10%;">
 
   <textarea class="field" style="top: 45.5%; left: 72%; width: 22%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
-  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5; font-size:14px; text-align: left;"></textarea>
+  
+  <!-- ★ 글씨 크기 12px 및 줄간격 축소 적용 ★ -->
+  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11.5%; resize:none; line-height:1.4; font-size:12px; text-align: left; overflow: hidden;"></textarea>
 
-  <canvas id="sig1" class="sig-canvas" style="top: 88%; left: 17%; width: 21%; height: 3%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
-  <canvas id="sig2" class="sig-canvas" style="top: 88%; left: 65%; width: 21%; height: 3%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
+  <canvas id="sig1" class="sig-canvas" style="top: 88%; left: 17%; width: 21%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
+  <canvas id="sig2" class="sig-canvas" style="top: 88%; left: 65%; width: 21%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
 
 <div class="controls-bar">
@@ -224,14 +227,14 @@
 </div>
 
 <script>
-  // O, X, / 클릭 토글 함수
+  // O, /, X 클릭 토글 함수
   function toggleCheck(element) {
     if (element.innerText === 'O') element.innerText = '/';
     else if (element.innerText === '/') element.innerText = 'X';
     else element.innerText = 'O';
   }
 
-  // 종합의견 다중 선택 처리 함수 (자동 번호 추가)
+  // 종합의견 다중 선택 처리 함수
   function handleOpinionSelect(selectedValue) {
     const opinionTextarea = document.getElementById('opinionText');
     const selectElement = document.getElementById('opinionSelect');
@@ -364,8 +367,7 @@
   window.addEventListener('resize', () => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); });
   setTimeout(() => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); }, 300);
 
-  // ================= PDF 구글 드라이브 자동 저장 =================
-// ================= PDF 구글 드라이브 자동 저장 (1장 고정 및 스크롤 밀림 방지) =================
+  // ================= PDF 구글 드라이브 자동 저장 (밀림 현상 방지 추가) =================
   function savePDF() {
     const googleAppScriptUrl = "https://script.google.com/macros/s/AKfycbxWYcxsEOm1rPRUVcUsbYHcoQGbVMpGsL3v6lfqm0hVMEFI11ogq8DC4YSfweZ2hJmy/exec";
     
@@ -401,7 +403,7 @@
       margin: 0,
       filename: dynamicFileName,
       image: { type: 'jpeg', quality: 1 },
-      // ★ scrollY: 0 옵션을 추가하여 위쪽 여백 생성 및 밀림 현상을 원천 차단합니다 ★
+      // ★ scrollY: 0 옵션을 추가하여 스크롤 위치에 따른 밀림 현상을 원천 차단합니다 ★
       html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
