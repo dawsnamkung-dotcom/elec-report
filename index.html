@@ -226,8 +226,8 @@
 <script>
   // O, X, / 클릭 토글 함수
   function toggleCheck(element) {
-    if (element.innerText === 'O') element.innerText = 'X';
-    else if (element.innerText === 'X') element.innerText = '/';
+    if (element.innerText === 'O') element.innerText = '/';
+    else if (element.innerText === '/') element.innerText = 'X';
     else element.innerText = 'O';
   }
 
