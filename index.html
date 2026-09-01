@@ -15,7 +15,7 @@
     .form-container { position: relative; max-width: 800px; margin: 0 auto; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     .bg-image { width: 100%; display: block; pointer-events: none; }
     
-    /* 텍스트 입력 필드 */
+    /* 텍스트 입력 필드 (기본: 가운데 정렬 적용) */
     .field { 
         position: absolute; 
         background: rgba(230, 240, 255, 0.6); 
@@ -25,6 +25,7 @@
         padding: 2px 4px;
         color: #000;
         border-radius: 2px;
+        text-align: center; /* 기본적으로 모든 입력창 가운데 정렬 */
     }
     .field:focus { background: rgba(255, 255, 255, 0.95); border: 2px solid #1e90ff; outline: none; z-index: 10;}
     
@@ -102,9 +103,9 @@
 <div class="form-container" id="pdf-area">
   <img src="form_bg.jpg" class="bg-image" alt="전기설비 점검기록표">
 
-  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 16%; width: 4.5%; text-align:center;">
-  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%; text-align:center;">
-  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 16%; left: 19%; width: 4.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 23.5%; width: 3.5%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 12.1%; left: 30.5%; width: 3.5%;">
 
   <input type="text" class="field" style="top: 15.1%; left: 12.5%; width: 34.5%;">
 
@@ -115,7 +116,7 @@
 
   <div id="check-items-container"></div>
   
-  <input type="text" inputmode="numeric" class="field" style="top: 41.2%; left: 88.5%; width: 5%; text-align:center;" value="0">
+  <input type="text" inputmode="numeric" class="field" style="top: 41.2%; left: 88.5%; width: 5%;" value="0">
 
   <input type="text" inputmode="numeric" class="field" style="top: 43.6%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 45.9%; left: 46.5%; width: 25.5%;">
@@ -127,13 +128,13 @@
   <input type="text" inputmode="numeric" class="field" style="top: 55.1%; left: 46.5%; width: 25.5%;">
   <input type="text" inputmode="numeric" class="field" style="top: 57.4%; left: 46.5%; width: 25.5%;">
 
-  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 12%; width: 10%; text-align:center;">
-  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%; text-align:center;">
-  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 60.5%; width: 10%; text-align:center;">
+  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 12%; width: 10%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%;">
+  <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 60.5%; width: 10%;">
 
-  <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5;"></textarea>
+  <textarea class="field" style="top: 43.5%; left: 72.8%; width: 26%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
   
-  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5; font-size:14px;"></textarea>
+  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11%; resize:none; line-height:1.5; font-size:14px; text-align: left;"></textarea>
 
   <canvas id="sig1" class="sig-canvas" style="top: 91.5%; left: 17%; width: 19%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
   <canvas id="sig2" class="sig-canvas" style="top: 91.5%; left: 59%; width: 19%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
