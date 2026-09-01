@@ -4,38 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>전기설비 점검기록표</title>
-  <!-- 최신 PDF 변환 엔진 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { background: #e9ecef; margin: 0; padding: 10px; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
     
-    /* 모달 오픈 시 배경 흔들림 완벽 차단 */
-    body.modal-open { overflow: hidden !important; }
+    /* ★ 흔들림 원천 차단: 제일 처음 성공했던 터치 잠금 코드 원복 ★ */
+    body.modal-open { overflow: hidden !important; touch-action: none !important; }
 
-    /* 양식 배경 컨테이너 */
     .form-container { position: relative; max-width: 800px; margin: 0 auto; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     .bg-image { width: 100%; display: block; pointer-events: none; }
     
-    /* 텍스트 입력 필드 */
+    /* 입력 필드 (위아래 여백을 없애서 잘림 원천 방지) */
     .field { 
         position: absolute; 
         background: rgba(230, 240, 255, 0.6); 
         border: 1px solid #70a1ff; 
         font-size: 14px; 
         box-sizing: border-box; 
-        padding: 2px 4px;
+        padding: 0 4px; 
         color: #000;
         border-radius: 2px;
         text-align: center;
     }
     .field:focus { background: rgba(255, 255, 255, 0.95); border: 2px solid #1e90ff; outline: none; z-index: 10;}
     
-    /* O, /, X 토글 버튼 */
+    /* O, /, X 토글 버튼 (굵기 일반으로 변경) */
     .check-field { 
         position: absolute; 
         cursor: pointer; 
-        font-weight: bold; 
+        font-weight: normal; 
         font-size: 15px;
         color: #0000ed; 
         background: rgba(230, 240, 255, 0.6); 
@@ -46,7 +44,6 @@
     }
     .check-field:active { background: rgba(150, 190, 255, 0.8); }
     
-    /* 서명 캔버스 */
     .sig-canvas { 
         position: absolute; 
         border: 1px dashed #007bff; 
@@ -56,13 +53,11 @@
     }
     .sig-canvas:hover { background: rgba(200, 225, 255, 0.7); }
     
-    /* PDF 저장 시 1장 강제 고정 및 글씨 검은색 변환 */
     .form-container.print-mode { box-shadow: none !important; margin: 0 !important; padding: 0 !important; border: none !important; }
     .print-mode .field { background: transparent !important; border: none !important; color: #000 !important; }
     .print-mode .check-field { background: transparent !important; border: none !important; color: #000 !important; }
     .print-mode .sig-canvas { border: none !important; background: transparent !important; }
     
-    /* 하단 조작 영역 */
     .controls-bar { max-width: 800px; margin: 15px auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
     .controls-group { margin-bottom: 12px; }
     .controls-group label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 14px; color: #333; }
@@ -71,13 +66,12 @@
     .btn-save { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     .btn-save:active { background: #0056b3; }
 
-    /* 서명 모달 팝업 스타일 */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0, 0, 0, 0.75);
         display: none; justify-content: center; align-items: center;
         z-index: 9999;
-        touch-action: none; overscroll-behavior: none;
+        touch-action: none; 
     }
     .modal-content {
         background: #fff; width: 90%; max-width: 600px;
@@ -174,13 +168,12 @@
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 35.5%; width: 10%;">
   <input type="text" inputmode="numeric" class="field" style="top: 59.8%; left: 59%; width: 10%;">
 
-  <!-- 특이사항 -->
+  <!-- 특이사항 (14px) -->
   <textarea class="field" style="top: 45.5%; left: 72%; width: 22%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
   
-  <!-- 종합의견 -->
-  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11.5%; resize:none; line-height:1.4; font-size:12px; text-align: left; overflow: hidden;"></textarea>
+  <!-- 종합의견 (특이사항과 동일하게 14px로 유지) -->
+  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11.5%; resize:none; line-height:1.5; font-size:14px; text-align: left; overflow: hidden; white-space: pre-wrap; word-break: break-all;"></textarea>
 
-  <!-- 서명란 -->
   <canvas id="sig1" class="sig-canvas" style="top: 87%; left: 17%; width: 21%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
   <canvas id="sig2" class="sig-canvas" style="top: 87%; left: 65%; width: 21%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
@@ -230,14 +223,12 @@
 </div>
 
 <script>
-  // O, /, X 클릭 토글
   function toggleCheck(element) {
     if (element.innerText === 'O') element.innerText = '/';
     else if (element.innerText === '/') element.innerText = 'X';
     else element.innerText = 'O';
   }
 
-  // 종합의견 다중 선택 처리 함수
   function handleOpinionSelect(selectedValue) {
     const opinionTextarea = document.getElementById('opinionText');
     const selectElement = document.getElementById('opinionSelect');
@@ -260,14 +251,13 @@
     selectElement.value = '';
   }
 
-  // ================= 서명 모달 및 스크롤 방지 =================
+  // ================= 서명 모달 로직 (흔들림 완벽 원복) =================
   let currentTargetCanvasId = null;
   const savedSignatures = { sig1: null, sig2: null };
   const modalCanvas = document.getElementById('modalCanvas');
   const modalCtx = modalCanvas.getContext('2d');
   const modalOverlay = document.getElementById('sigModal');
   let isModalDrawing = false;
-  let scrollPosition = 0;
 
   modalOverlay.addEventListener('touchmove', function(e) {
       e.preventDefault();
@@ -295,8 +285,7 @@
     currentTargetCanvasId = targetId;
     document.getElementById('modalTitle').innerText = title;
     
-    scrollPosition = window.pageYOffset;
-    document.body.style.top = `-${scrollPosition}px`;
+    // 이전에 완벽하게 작동했던 깔끔한 클래스 추가 방식
     document.body.classList.add('modal-open');
     modalOverlay.style.display = 'flex';
 
@@ -320,8 +309,6 @@
   function closeModal() { 
     modalOverlay.style.display = 'none'; 
     document.body.classList.remove('modal-open');
-    document.body.style.top = '';
-    window.scrollTo(0, scrollPosition);
   }
   
   function clearModalCanvas() { modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height); }
@@ -373,7 +360,7 @@
   window.addEventListener('resize', () => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); });
   setTimeout(() => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); }, 300);
 
-  // ================= ★ 모든 텍스트 완벽 줄바꿈 보장 및 PDF 생성 ★ =================
+  // ================= ★ 텍스트 하단 잘림 해결 및 PDF 생성 ★ =================
   function savePDF() {
     const googleAppScriptUrl = "https://script.google.com/macros/s/AKfycbxWYcxsEOm1rPRUVcUsbYHcoQGbVMpGsL3v6lfqm0hVMEFI11ogq8DC4YSfweZ2hJmy/exec";
     
@@ -404,29 +391,33 @@
     saveBtn.innerText = "PDF 생성 중 (잠시만 기다려주세요)...";
     saveBtn.disabled = true;
 
-    // ★ 텍스트가 1줄로 뻗거나 잘리는 현상을 원천 차단하는 핵심 로직 ★
-    // 특이사항 및 종합의견 등 모든 textarea를 인식하여 화면 밖으로 글자가 나가지 않게 HTML 줄바꿈으로 고정
-    const textareas = element.querySelectorAll('textarea');
+    // 모든 textarea와 text input을 div로 완벽하게 복제 (숫자 하단 잘림 문제 원천 차단)
+    const inputFields = element.querySelectorAll('textarea, input[type="text"]');
     const replacers = [];
-    textareas.forEach(ta => {
+    
+    inputFields.forEach(field => {
       const div = document.createElement('div');
-      div.style.cssText = ta.style.cssText; // 기존 스타일 복사
-      div.className = ta.className;
+      div.style.cssText = field.style.cssText; 
+      div.className = field.className;
       
-      div.style.whiteSpace = "normal";       // 자동 줄바꿈 강제 허용
-      div.style.wordBreak = "break-all";     // 박스 너비 넘어가면 무조건 줄바꿈
-      div.style.overflow = "hidden";         // 상자 밖으로 튀어나가는 텍스트 원천 차단 (2페이지 밀림 완벽방지)
+      div.style.overflow = "hidden";
       div.style.background = "transparent";
       div.style.border = "none";
       div.style.color = "#000";
       
-      // 특수문자 깨짐 방지 및 텍스트의 엔터(\n)를 HTML 줄바꿈(<br>)으로 완벽 치환
-      let safeText = ta.value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      div.innerHTML = safeText.replace(/\n/g, '<br>');
+      if (field.tagName.toLowerCase() === 'textarea') {
+        div.style.whiteSpace = "pre-wrap";       
+        div.style.wordBreak = "break-all";     
+        let safeText = field.value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        div.innerHTML = safeText.replace(/\n/g, '<br>');
+      } else {
+        div.style.whiteSpace = "nowrap";
+        div.innerText = field.value;
+      }
 
-      ta.parentNode.insertBefore(div, ta);
-      ta.style.display = 'none'; // 원본 textarea 숨김
-      replacers.push({ ta: ta, div: div });
+      field.parentNode.insertBefore(div, field);
+      field.style.display = 'none';
+      replacers.push({ field: field, div: div });
     });
 
     element.classList.add('print-mode');
@@ -449,10 +440,10 @@
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
       const pdfBase64 = pdf.output('datauristring');
 
-      // PDF 렌더링이 끝나면 원래 텍스트 상자로 원상복구
+      // 변환 완료 후 원래 입력창으로 복구
       replacers.forEach(rep => {
         rep.div.parentNode.removeChild(rep.div);
-        rep.ta.style.display = '';
+        rep.field.style.display = '';
       });
 
       fetch(googleAppScriptUrl, {
