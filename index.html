@@ -4,12 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>전기설비 점검기록표</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- ★ 최신 PDF 변환 엔진으로 교체 (1장 고정 및 텍스트 렌더링 오류 완벽 해결) ★ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { background: #e9ecef; margin: 0; padding: 10px; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
     
-    /* 서명창 열렸을 때 배경 스크롤 완벽 차단용 클래스 */
-    body.modal-open { overflow: hidden !important; touch-action: none !important; }
+    /* ★ 모바일/태블릿 서명 시 절대 안 흔들리게 화면을 얼려버리는 강력한 스크롤 잠금 ★ */
+    body.modal-open { 
+        overflow: hidden !important; 
+        touch-action: none !important; 
+        position: fixed; 
+        width: 100%; 
+        height: 100%; 
+    }
 
     /* 양식 배경 컨테이너 */
     .form-container { position: relative; max-width: 800px; margin: 0 auto; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
@@ -29,7 +37,7 @@
     }
     .field:focus { background: rgba(255, 255, 255, 0.95); border: 2px solid #1e90ff; outline: none; z-index: 10;}
     
-    /* O, X, / 토글 버튼 (화면에서는 파란색) */
+    /* O, X, / 토글 버튼 */
     .check-field { 
         position: absolute; 
         cursor: pointer; 
@@ -54,10 +62,10 @@
     }
     .sig-canvas:hover { background: rgba(200, 225, 255, 0.7); }
     
-    /* ★ PDF 저장 시 강제 적용되는 마법의 클래스 ★ */
-    .form-container.print-mode { box-shadow: none !important; margin: 0 !important; border: none !important; } /* 2페이지 넘어감 원천 차단 */
-    .print-mode .field { background: transparent !important; border: none !important; color: #000 !important; } /* 글자 검은색 고정 */
-    .print-mode .check-field { background: transparent !important; border: none !important; color: #000 !important; } /* O/X 글자 검은색 고정 */
+    /* ★ PDF 저장 시 1장 초과 밀림 방지 및 강제 검은색 변환 클래스 ★ */
+    .form-container.print-mode { box-shadow: none !important; margin: 0 !important; border: none !important; border-radius: 0 !important; } 
+    .print-mode .field { background: transparent !important; border: none !important; color: #000 !important; }
+    .print-mode .check-field { background: transparent !important; border: none !important; color: #000 !important; }
     .print-mode .sig-canvas { border: none !important; background: transparent !important; }
     
     /* 하단 조작 영역 */
@@ -175,11 +183,11 @@
 
   <textarea class="field" style="top: 45.5%; left: 72%; width: 22%; height: 16%; resize:none; line-height:1.5; text-align: left;"></textarea>
   
-  <!-- ★ 글씨 크기 12px 및 줄간격 축소 적용 ★ -->
-  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11.5%; resize:none; line-height:1.4; font-size:12px; text-align: left; overflow: hidden;"></textarea>
+  <!-- ★ 글씨 줄바꿈 방지(white-space: pre-wrap) 및 한 줄로 뻗어나가는 버그 원천 수정 ★ -->
+  <textarea id="opinionText" class="field" style="top: 77%; left: 5%; width: 90%; height: 11.5%; resize:none; line-height:1.4; font-size:12px; text-align: left; overflow: hidden; white-space: pre-wrap; word-break: break-all;"></textarea>
 
-  <canvas id="sig1" class="sig-canvas" style="top: 88%; left: 17%; width: 21%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
-  <canvas id="sig2" class="sig-canvas" style="top: 88%; left: 65%; width: 21%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
+  <canvas id="sig1" class="sig-canvas" style="top: 87%; left: 17%; width: 21%; height: 4.5%;" onclick="openSigModal('sig1', '점검자 성명 및 서명')"></canvas>
+  <canvas id="sig2" class="sig-canvas" style="top: 87%; left: 65%; width: 21%; height: 4.5%;" onclick="openSigModal('sig2', '확인자 성명 및 서명')"></canvas>
 </div>
 
 <div class="controls-bar">
@@ -257,13 +265,14 @@
     selectElement.value = '';
   }
 
-  // ================= 서명 모달 및 스크롤 방지 로직 =================
+  // ================= 서명 모달 및 강력한 스크롤 방지 로직 =================
   let currentTargetCanvasId = null;
   const savedSignatures = { sig1: null, sig2: null };
   const modalCanvas = document.getElementById('modalCanvas');
   const modalCtx = modalCanvas.getContext('2d');
   const modalOverlay = document.getElementById('sigModal');
   let isModalDrawing = false;
+  let scrollPosition = 0; // 모달 열기 전 스크롤 위치 저장용
 
   modalOverlay.addEventListener('touchmove', function(e) {
       e.preventDefault();
@@ -291,6 +300,9 @@
     currentTargetCanvasId = targetId;
     document.getElementById('modalTitle').innerText = title;
     
+    // ★ 모달 오픈 시 화면 완벽 잠금 (화면 위로 튕김 방지 포함) ★
+    scrollPosition = window.pageYOffset;
+    document.body.style.top = `-${scrollPosition}px`;
     document.body.classList.add('modal-open');
     modalOverlay.style.display = 'flex';
 
@@ -313,7 +325,10 @@
 
   function closeModal() { 
     modalOverlay.style.display = 'none'; 
+    // ★ 모달 종료 시 잠금 해제 및 원래 스크롤 위치 복귀 ★
     document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    window.scrollTo(0, scrollPosition);
   }
   
   function clearModalCanvas() { modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height); }
@@ -327,11 +342,9 @@
       const img = new Image();
       img.onload = function() {
         clearModalCanvas();
-        
         const scale = Math.min(modalCanvas.width / img.width, modalCanvas.height / img.height);
         const x = (modalCanvas.width / 2) - (img.width / 2) * scale;
         const y = (modalCanvas.height / 2) - (img.height / 2) * scale;
-        
         modalCtx.drawImage(img, x, y, img.width * scale, img.height * scale);
       };
       img.src = e.target.result;
@@ -367,7 +380,7 @@
   window.addEventListener('resize', () => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); });
   setTimeout(() => { renderTargetCanvas('sig1'); renderTargetCanvas('sig2'); }, 300);
 
-  // ================= PDF 구글 드라이브 자동 저장 (밀림 현상 방지 추가) =================
+  // ================= ★ 신규 엔진 기반 1장 강제 고정 PDF 생성 =================
   function savePDF() {
     const googleAppScriptUrl = "https://script.google.com/macros/s/AKfycbxWYcxsEOm1rPRUVcUsbYHcoQGbVMpGsL3v6lfqm0hVMEFI11ogq8DC4YSfweZ2hJmy/exec";
     
@@ -396,28 +409,40 @@
     const dynamicFileName = `전기설비점검기록표_${custName}${dateStr}.pdf`;
 
     element.classList.add('print-mode');
-    saveBtn.innerText = "구글 드라이브로 PDF 전송 중...";
+    saveBtn.innerText = "PDF 생성 중 (잠시만 기다려주세요)...";
     saveBtn.disabled = true;
+
+    // 화면이 스크롤되어 있어도 맨 위로 고정시켜 잘림 완벽 방지
+    window.scrollTo(0, 0);
     
-    const opt = {
-      margin: 0,
-      filename: dynamicFileName,
-      image: { type: 'jpeg', quality: 1 },
-      // ★ scrollY: 0 옵션을 추가하여 스크롤 위치에 따른 밀림 현상을 원천 차단합니다 ★
-      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).outputPdf('datauristring').then(function(pdfBase64) {
+    // 신형 html2canvas 및 jsPDF를 직접 제어하여 무조건 1장에 압축
+    html2canvas(element, { 
+      scale: 2, 
+      useCORS: true, 
+      scrollY: 0,
+      scrollX: 0
+    }).then(canvas => {
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
       
-      const payload = {
-        fileName: dynamicFileName,
-        fileData: pdfBase64
-      };
+      // jsPDF 활성화 및 A4 세팅
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      // 이미지의 원본 비율과 상관없이 무조건 A4 1장에 꽉 차게 구겨넣습니다. (2장 넘어감 절대 불가)
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      
+      const pdfBase64 = pdf.output('datauristring');
 
+      // 구글 드라이브로 전송
       fetch(googleAppScriptUrl, {
         method: 'POST',
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          fileName: dynamicFileName,
+          fileData: pdfBase64
+        })
       })
       .then(response => response.json())
       .then(result => {
